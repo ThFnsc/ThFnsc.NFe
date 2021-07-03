@@ -13,6 +13,7 @@
 **/*.jfm
 **/azds.yaml
 **/bin
+**/.editorconfig
 **/charts
 **/docker-compose*
 **/Dockerfile*
@@ -23,3 +24,6 @@
 **/values.dev.yaml
 LICENSE
 README.md
+data
+keys
+mysql_data

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ThFnsc.NFe.Configuration;
+using ThFnsc.NFe.Data.Context;
 
 namespace ThFnsc.NFe
 {
@@ -28,8 +30,12 @@ namespace ThFnsc.NFe
                 .AddContextConfigs(Configuration)
                 .AddGeneralConfigs(Environment);
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            NFContext context)
         {
+            context.Database.Migrate();
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
