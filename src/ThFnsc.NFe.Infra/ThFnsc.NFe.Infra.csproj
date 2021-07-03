@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\Thiag\.nuget\packages\select.htmltopdf.netcore\21.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\Thiag\.nuget\packages\select.htmltopdf\21.1.0\contentFiles\any\any\Select.Html.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="21.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PDF\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ThFnsc.NFe.Core\ThFnsc.NFe.Core.csproj" />
+    <ProjectReference Include="..\ThFnsc.NFe.Data\ThFnsc.NFe.Data.csproj" />
+  </ItemGroup>
+
+</Project>

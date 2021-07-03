@@ -1,0 +1,64 @@
+﻿@inject NFContext _context
+
+@if (_documents is null)
+{
+    <p>Carregando...</p>
+}
+else if (!_documents.Any())
+{
+    <p>Nenhum documento encontrado</p>
+}
+else
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <td>Tipo</td>
+                <td>Número</td>
+                <td>Nome</td>
+                <td>Email</td>
+                <td>Logradouro</td>
+                <td>Número</td>
+                <td>Complemento</td>
+                <td>Cidade</td>
+                <td>Id cidade</td>
+                <td>Estado</td>
+                <td>Cod. postal</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var document in _documents)
+            {
+                <tr>
+                    <td>@document.DocType</td>
+                    <td>@document.DocIdentifier</td>
+                    <td>@document.Name</td>
+                    <td>@document.Email</td>
+                    <td>@document.Address.Street</td>
+                    <td>@document.Address.StreetNumber</td>
+                    <td>@document.Address.Complement</td>
+                    <td>@document.Address.City</td>
+                    <td>@document.Address.CityId</td>
+                    <td>@document.Address.State</td>
+                    <td>@document.Address.PostalCode</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Document> _documents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _documents = await _context.Documents
+            .Active()
+            .Include(d => d.Address)
+            .OrderByDescending(d => d.CreatedAt)
+            .ToListAsync();
+    }
+
+    public void AddDocument(Document document) =>
+        _documents.Insert(0, document);
+}

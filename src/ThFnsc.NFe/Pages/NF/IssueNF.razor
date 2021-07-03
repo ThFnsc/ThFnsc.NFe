@@ -1,0 +1,115 @@
+﻿@inject NFeAppService _nfe
+@inject NFContext _context
+@inject IJSRuntime _js
+
+@if (_model is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="Submit">
+        <div class="row">
+            <div class="form-group col-xs-12 col-lg-6">
+                <LabelFor For="() => _model.FromId" />
+                <InputSelect @bind-Value="_model.FromId" class="form-control">
+                    <option value="">Selecionar</option>
+                    @foreach (var doc in _providers)
+                        {
+                        <option value="@doc.Key">@doc.Value</option>
+                        }
+                </InputSelect>
+            </div>
+
+            <div class="form-group col-xs-12 col-lg-6">
+                <LabelFor For="() => _model.ToId" />
+                <InputSelect @bind-Value="_model.ToId" class="form-control">
+                    <option value="">Selecionar</option>
+                    @foreach (var doc in _documents)
+                        {
+                        <option value="@doc.Key">@doc.Value</option>
+                        }
+                </InputSelect>
+            </div>
+
+            <div class="form-group col-xs-12 col-lg-4">
+                <LabelFor For="() => _model.Value" />
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">R$</span>
+                    </div>
+                    <InputNumber @bind-Value="_model.Value" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 col-lg-4">
+                <LabelFor For="() => _model.ServiceId" />
+                <InputNumber @bind-Value="_model.ServiceId" class="form-control" />
+            </div>
+
+            <div class="form-group col-xs-12 col-lg-4">
+                <LabelFor For="() => _model.AliquotPercentage" />
+                <div class="input-group">
+                    <InputNumber @bind-Value="_model.AliquotPercentage" class="form-control" />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon1">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 col-lg-12">
+                <LabelFor For="() => _model.ServiceDescription" />
+                <InputText @bind-Value="_model.ServiceDescription" class="form-control" />
+            </div>
+
+
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">Gerar</button>
+    </EditForm>
+}
+
+
+@code {
+    private GenerateNFModel _model;
+    private IDictionary<int, string> _providers;
+    private IDictionary<int, string> _documents;
+
+    [Parameter]
+    public EventCallback<IssuedNFe> OnNFIssued { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _documents = await _context.Documents
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Name);
+
+        _providers = await _context.Providers
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Issuer.Name);
+
+        _model = await _context.NFes
+            .Active()
+            .OrderBy(n => n.Id)
+            .Select(nf => new GenerateNFModel
+            {
+                AliquotPercentage = nf.AliquotPercentage,
+                FromId = nf.Provider.Id,
+                ServiceDescription = nf.ServiceDescription,
+                ServiceId = nf.ServiceId,
+                ToId = nf.DocumentTo.Id,
+                Value = nf.Value
+            })
+            .LastOrDefaultAsync();
+
+        if (_model is null)
+            _model = new();
+    }
+
+    public async Task Submit()
+    {
+        if (!await _js.InvokeAsync<bool>("confirm", $"Tem certeza que deseja gerar uma nota de R${_model.Value} para {_documents[_model.ToId]}?"))
+            return;
+        var nf = await _nfe.IssueNFeAsync(_model.FromId, _model.ToId, _model.Value, _model.ServiceId, _model.ServiceDescription, _model.AliquotPercentage);
+        await OnNFIssued.InvokeAsync(nf);
+    }
+}

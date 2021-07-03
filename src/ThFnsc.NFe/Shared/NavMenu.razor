@@ -1,0 +1,54 @@
+﻿@using System.Reflection
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">NFs</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        @foreach (var route in _routes.Value)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="@route.Route" Match="NavLinkMatch.All">
+                    <span class="oi oi-@route.Display.OpenIcon" aria-hidden="true"></span> @route.Display.Name
+                </NavLink>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private static Lazy<List<Page>> _routes = new(() => Assembly.GetExecutingAssembly()
+        .GetTypes()
+        .Where(t => t.IsSubclassOf(typeof(ComponentBase)))
+        .Select(t => new Page
+        {
+            Display = t.GetCustomAttribute<PageDisplayAttribute>(),
+            Route = t.GetCustomAttributes<RouteAttribute>()
+                .OrderBy(a => a.Template.Length)
+                .FirstOrDefault()?
+                .Template
+        })
+        .Where(p => p.Route is not null && p.Display is not null)
+        .OrderBy(p => p.Display.Order)
+        .ToList());
+
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private class Page
+    {
+        public PageDisplayAttribute Display { get; set; }
+
+        public string Route { get; set; }
+    }
+}

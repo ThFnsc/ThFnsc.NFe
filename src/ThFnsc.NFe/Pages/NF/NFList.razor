@@ -1,0 +1,85 @@
+﻿@using ThFnsc.NFe.Data.Entities
+@inject ThFnsc.NFe.Data.Context.NFContext _context
+@inject NavigationManager _navManager
+
+@if (_nfes == null)
+{
+    <Loader />
+}
+else if (!_nfes.Any())
+{
+    <div class="alert alert-info">Nada encontrado.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <td>Data</td>
+                <td>Série</td>
+                <td>Valor</td>
+                <td>Cód. Verif.</td>
+                <td>De</td>
+                <td>Para</td>
+                <td>Ações</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var nf in _nfes)
+            {
+                var statusColor = nf.Success.HasValue
+                    ? nf.Success.Value
+                        ? "success"
+                        : "danger"
+                    : "warning";
+                <tr class="table-@statusColor">
+                    <td>@nf.CreatedAt</td>
+                    <td>@nf.Series</td>
+                    <td>R$@nf.Value.ToString("0.00")</td>
+                    <td>@nf.VerificationCode</td>
+                    <td>@nf.Provider.Issuer.Name</td>
+                    <td>@nf.DocumentTo.Name</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-sm" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
+                                <span class="oi oi-cloud-download"></span>
+                            </button>
+                            @if (nf.Success is null || !nf.Success.Value)
+                            {
+                                <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
+                                    <span class="oi oi-trash"></span>
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<IssuedNFe> _nfes;
+
+    public void AddNFe(IssuedNFe nfe) =>
+        _nfes.Insert(0, nfe);
+
+    protected override async Task OnInitializedAsync() 
+    {
+        _nfes = await _context.NFes
+            .Active()
+            .Include(n => n.Provider)
+                .ThenInclude(p => p.Issuer)
+            .Include(n => n.DocumentTo)
+            .OrderByDescending(n=>n.Success)
+                .ThenByDescending(n=>n.Series)
+            .ToListAsync();
+    }
+
+    private async Task DeleteAsync(IssuedNFe nfe)
+    {
+        nfe.Delete();
+        await _context.SaveChangesAsync();
+        _nfes.Remove(nfe);
+    }
+}

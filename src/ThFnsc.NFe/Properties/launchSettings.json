@@ -1,0 +1,22 @@
+{
+    "profiles": {
+        "ThFnsc.NFe": {
+            "commandName": "Project",
+            "launchBrowser": true,
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "dotnetRunMessages": "true",
+            "applicationUrl": "http://localhost:24621"
+        },
+        "ThFnsc.NFe (no nav)": {
+            "commandName": "Project",
+            "launchBrowser": false,
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "dotnetRunMessages": "true",
+            "applicationUrl": "http://localhost:24621"
+        }
+    }
+}
