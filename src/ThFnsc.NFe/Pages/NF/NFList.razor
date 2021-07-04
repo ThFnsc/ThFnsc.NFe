@@ -41,8 +41,11 @@ else
                     <td>@nf.DocumentTo.Name</td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-primary btn-sm" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
-                                <span class="oi oi-cloud-download"></span>
+                            <button class="btn btn-primary btn-sm" title="Baixar PDF" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
+                                <span class="oi oi-document"></span>
+                            </button>
+                            <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
+                                <span class="oi oi-code"></span>
                             </button>
                             @if (nf.Success is null || !nf.Success.Value)
                             {

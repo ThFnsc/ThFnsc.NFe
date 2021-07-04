@@ -20,26 +20,27 @@ namespace ThFnsc.NFe.Infra.IPMNF
             _client = client;
         }
 
-        private static TownHallResponse ParseFromHTML(string html)
+        private (int series, string verifCode) ParseReturnedHTML(string html)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var series = doc.DocumentNode.SelectSingleNode("//*[contains(text(),'Número da NFS-e')]/parent::*/*[last()]");
             var verifCode = doc.DocumentNode.SelectSingleNode("//*[contains(text(),'Autenticidade')]/parent::*/*[last()]");
-            var res = new TownHallResponse { RawResponse = html };
-            if (series is not null && verifCode is not null)
-                if (int.TryParse(series.InnerHtml.Trim(), out var seriesInt))
-                {
-                    res.Series = seriesInt;
-                    res.VerificationCode = verifCode.InnerText.Trim();
-                    res.Success = !string.IsNullOrWhiteSpace(res.VerificationCode);
-                }
-            return res;
+            return (int.Parse(series.InnerText.Trim()), verifCode.InnerText.Trim());
         }
 
-        public async Task<TownHallResponse> GenerateFromXMLAsync(IssuedNFe nfe, string xml)
+        private static string GenerateRequestXML(IssuedNFe nfe) =>
+            Serializer.GenerateNFe(
+                from: nfe.Provider.Issuer,
+                to: nfe.DocumentTo,
+                value: nfe.Value,
+                serviceId: nfe.ServiceId,
+                serviceDescription: nfe.ServiceDescription,
+                aliquotPercentage: nfe.AliquotPercentage);
+
+        private async Task<string> PostAsync(string xml, IssuedNFe nfe, string url)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php");
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
             var formData = new MultipartFormDataContent();
             var data = JsonSerializer.Deserialize<DataModel>(nfe.Provider.Data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             formData.Add(new StringContent(nfe.Provider.Issuer.DocIdentifier), "login");
@@ -51,19 +52,84 @@ namespace ThFnsc.NFe.Infra.IPMNF
             var res = await _client.SendAsync(request);
             var resBody = await res.Content.ReadAsStringAsync();
 
-            try { res.EnsureSuccessStatusCode(); }
-            catch (Exception e) { e.Data["ResponseText"] = resBody; throw; }
-
-            return ParseFromHTML(resBody);
+            try
+            {
+                res.EnsureSuccessStatusCode();
+                return resBody;
+            }
+            catch (Exception e)
+            {
+                e.Data["ResponseText"] = resBody;
+                throw;
+            }
         }
 
-        public Task<string> GenerateXMLAsync(IssuedNFe nfe) =>
-            Task.FromResult(Serializer.GenerateNFe(
-                from: nfe.Provider.Issuer,
-                to: nfe.DocumentTo,
-                value: nfe.Value,
-                serviceId: nfe.ServiceId,
-                serviceDescription: nfe.ServiceDescription,
-                aliquotPercentage: nfe.AliquotPercentage));
+        public async Task<TownHallResponse> GenerateAsync(IssuedNFe nfe)
+        {
+            var requestXML = GenerateRequestXML(nfe);
+            string response = null;
+
+            try
+            {
+                response = await PostAsync(requestXML, nfe, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php");
+            }
+            catch (Exception e)
+            {
+                return new TownHallResponse { Error = e, SentXML = requestXML, RawResponse = response };
+            }
+
+            return await ProcessResponseAsync(requestXML, response, nfe);
+        }
+
+        public async Task<TownHallResponse> ProcessResponseAsync(string sent, string received, IssuedNFe nfe)
+        {
+            var response = new TownHallResponse
+            {
+                SentXML = sent,
+                RawResponse = received
+            };
+
+            try
+            {
+                (response.Series, response.VerificationCode) = ParseReturnedHTML(response.RawResponse);
+            }
+            catch (Exception e)
+            {
+                response.Error = e;
+                return response;
+            }
+
+            try
+            {
+                response.ReturnedXML = await PostAsync(GetXMLXML(response.VerificationCode), nfe, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php?formato_saida=2&eletron=1");
+            }
+            catch (Exception e)
+            {
+                response.Error = e;
+                return response;
+            }
+
+            try
+            {
+                response.ReturnedPDF = HtmlToPDF.ConvertHTMLToPDF(response.RawResponse).ToArray();
+            }
+            catch (Exception e)
+            {
+                response.Error = e;
+                return response;
+            }
+
+            response.Success = true;
+            return response;
+        }
+
+        private static string GetXMLXML(string verificationCode) =>
+            Serializer.SerializeXML(new Models.Search.NFSE
+            {
+                Pesquisa = new Models.Search.Pesquisa
+                {
+                    CodAutent = verificationCode
+                }
+            });
     }
 }

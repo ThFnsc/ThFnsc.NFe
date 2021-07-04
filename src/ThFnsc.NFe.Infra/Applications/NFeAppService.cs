@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
@@ -20,15 +19,6 @@ namespace ThFnsc.NFe.Infra.Applications
         {
             _clients = clients;
             _context = context;
-        }
-
-        public async Task<(Stream, IssuedNFe)> PDFForIdAsync(int id)
-        {
-            var nf = await _context.NFes
-                .OfId(id)
-                .SingleAsync();
-
-            return (HtmlToPDF.ConvertHTMLToPDF(nf.ReturnedContent), nf);
         }
 
         public async Task<IssuedNFe> IssueNFeAsync(
@@ -61,35 +51,24 @@ namespace ThFnsc.NFe.Infra.Applications
                 aliquotPercentage: aliquotPercentage,
                 documentTo: toDocument);
 
-            var xml = await client.GenerateXMLAsync(nf);
             _context.Add(nf);
+
             await _context.SaveChangesAsync();
+
             try
             {
-                var res = await client.GenerateFromXMLAsync(nf, xml);
-                if (res.Success)
-                    nf.OnSuccess(
-                        returnedContent: res.RawResponse,
-                        series: res.Series,
-                        verificationCode: res.VerificationCode,
-                        issuedAt: DateTimeOffset.UtcNow, sentContent: xml);
-                else
-                    nf.OnError(
-                        returnedContent: res.RawResponse,
-                        errorMessage: "Could not parse response", sentContent: xml);
-                return nf;
+                var res = await client.GenerateAsync(nf);
+                nf.OnReturned(res.Success, res.Error?.Message, res.SentXML, res.RawResponse, res.ReturnedXML, res.ReturnedPDF, res.Series, res.VerificationCode, DateTimeOffset.UtcNow);
             }
             catch (Exception e)
             {
-                nf.OnError(
-                    returnedContent: null,
-                    errorMessage: e.Message, sentContent: xml);
-                throw;
+                nf.OnReturned(false, e.Message, null, null, null, null, 0, null, DateTimeOffset.UtcNow);
             }
             finally
             {
                 await _context.SaveChangesAsync();
             }
+            return nf;
         }
     }
 }

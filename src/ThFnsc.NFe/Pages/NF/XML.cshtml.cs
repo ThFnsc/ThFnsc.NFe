@@ -2,17 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Repositories;
 
 namespace ThFnsc.NFe.Pages.NF
 {
-    public class PDFModel : PageModel
+    public class XMLModel : PageModel
     {
         private readonly NFContext _context;
 
-        public PDFModel(NFContext context)
+        public XMLModel(NFContext context)
         {
             _context = context;
         }
@@ -23,11 +24,11 @@ namespace ThFnsc.NFe.Pages.NF
                 .OfId(id)
                 .Select(nf => new
                 {
-                    nf.Series,
-                    PDF = nf.ReturnedPDF
+                    Series = nf.Series,
+                    XML = nf.ReturnedXMLContent
                 })
                 .SingleAsync();
-            return File(nf.PDF, "application/pdf", $"NF-{nf.Series}.pdf");
+            return File(Encoding.UTF8.GetBytes(nf.XML), "application/xml", $"NF-{nf.Series}.xml");
         }
     }
 }

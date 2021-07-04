@@ -1,14 +1,11 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Data.Repositories;
-using ThFnsc.NFe.Infra.IPMNF.Models;
 
 namespace ThFnsc.NFe.Infra.Applications
 {
@@ -31,14 +28,16 @@ namespace ThFnsc.NFe.Infra.Applications
             var sg = await _context.ScheduledGenerations
                 .Active()
                 .OfId(id)
-                .Where(s=>s.Enabled)
-                .Include(s=>s.MailTemplate)
-                .Include(s=>s.ToDocument)
-                .Include(s=>s.Provider)
+                .Where(s => s.Enabled)
+                .Include(s => s.MailTemplate)
+                .Include(s => s.ToDocument)
+                .Include(s => s.Provider)
                 .SingleAsync();
 
             throw new NotImplementedException($"{id} Still experimental");
             var nfe = await _nfe.IssueNFeAsync(sg.Provider.Id, sg.ToDocument.Id, sg.Value, sg.ServiceId, sg.ServiceDescription, sg.AliquotPercentage);
+            if (!nfe.Success.Value)
+                throw new Exception(nfe.ErrorMessage);
             return nfe;
         }
 

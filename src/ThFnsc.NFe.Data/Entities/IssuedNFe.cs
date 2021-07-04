@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using ThFnsc.NFe.Data.Entities.Shared;
 
 namespace ThFnsc.NFe.Data.Entities
@@ -19,6 +20,11 @@ namespace ThFnsc.NFe.Data.Entities
         public DateTimeOffset IssuedAt { get; private set; }
 
         public string ReturnedContent { get; private set; }
+
+        public string ReturnedXMLContent { get; private set; }
+
+        [Column(TypeName = "MEDIUMBLOB")]
+        public byte[] ReturnedPDF { get; private set; }
 
         public string SentContent { get; private set; }
 
@@ -48,26 +54,28 @@ namespace ThFnsc.NFe.Data.Entities
             DocumentTo = documentTo ?? throw new ArgumentNullException(nameof(documentTo));
         }
 
-        public void OnSuccess(string returnedContent, int series, string verificationCode, DateTimeOffset issuedAt, string sentContent)
+        public void OnReturned(
+            bool success,
+            string errorMessage,
+            string sentContent,
+            string contentReceivedRaw,
+            string returnedXMLContent,
+            byte[] returnedPDF,
+            int series,
+            string verificationCode,
+            DateTimeOffset issuedAt)
         {
             if (Success.HasValue)
                 throw new InvalidOperationException();
-            Series = series;
-            VerificationCode = verificationCode ?? throw new ArgumentNullException(nameof(verificationCode));
-            IssuedAt = issuedAt;
-            ReturnedContent = returnedContent ?? throw new ArgumentNullException(nameof(returnedContent));
-            SentContent = sentContent ?? throw new ArgumentNullException(nameof(sentContent));
-            Success = true;
-        }
-
-        public void OnError(string returnedContent, string errorMessage, string sentContent)
-        {
-            if (Success.HasValue)
-                throw new InvalidOperationException();
+            Success = success;
             ErrorMessage = errorMessage;
-            ReturnedContent = returnedContent;
-            SentContent = sentContent ?? throw new ArgumentNullException(nameof(sentContent));
-            Success = false;
+            SentContent = sentContent;
+            ReturnedContent = contentReceivedRaw;
+            ReturnedXMLContent = returnedXMLContent;
+            ReturnedPDF = returnedPDF;
+            Series = series;
+            VerificationCode = verificationCode;
+            IssuedAt = issuedAt;
         }
 
         protected IssuedNFe() { }

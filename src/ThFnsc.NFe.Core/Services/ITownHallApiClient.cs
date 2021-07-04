@@ -6,8 +6,6 @@ namespace ThFnsc.NFe.Core.Services
 {
     public interface ITownHallApiClient
     {
-        Task<string> GenerateXMLAsync(IssuedNFe nfe);
-
-        Task<TownHallResponse> GenerateFromXMLAsync(IssuedNFe nfe, string xml);
+        Task<TownHallResponse> GenerateAsync(IssuedNFe nfe);
     }
 }
