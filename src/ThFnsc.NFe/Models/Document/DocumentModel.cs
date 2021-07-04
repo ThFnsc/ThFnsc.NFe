@@ -1,6 +1,6 @@
 ﻿using ThFnsc.NFe.Models.Address;
 
-namespace ThFnsc.NFe.Models
+namespace ThFnsc.NFe.Models.Document
 {
     public class DocumentModel
     {

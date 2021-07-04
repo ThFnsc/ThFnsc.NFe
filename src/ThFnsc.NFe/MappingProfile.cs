@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using ThFnsc.NFe.Data.Entities;
-using ThFnsc.NFe.Models;
 using ThFnsc.NFe.Models.Address;
+using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.MailTemplate;
 using ThFnsc.NFe.Models.Provider;
 using ThFnsc.NFe.Models.ScheduledGeneration;
+using ThFnsc.NFe.Models.SMTP;
 
 namespace ThFnsc.NFe
 {

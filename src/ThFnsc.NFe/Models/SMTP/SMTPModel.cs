@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ThFnsc.NFe.Models
+namespace ThFnsc.NFe.Models.SMTP
 {
     public class SMTPModel
     {

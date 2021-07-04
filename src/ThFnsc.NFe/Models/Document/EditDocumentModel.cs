@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using ThFnsc.NFe.Models.Address;
 
-namespace ThFnsc.NFe.Models
+namespace ThFnsc.NFe.Models.Document
 {
     public class EditDocumentModel
     {

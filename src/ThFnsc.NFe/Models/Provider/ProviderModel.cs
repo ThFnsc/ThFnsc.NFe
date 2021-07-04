@@ -1,4 +1,7 @@
-﻿namespace ThFnsc.NFe.Models.Provider
+﻿using ThFnsc.NFe.Models.Document;
+using ThFnsc.NFe.Models.SMTP;
+
+namespace ThFnsc.NFe.Models.Provider
 {
     public class ProviderModel
     {
