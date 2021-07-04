@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models;
 using ThFnsc.NFe.Models.Address;

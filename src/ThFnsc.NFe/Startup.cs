@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,8 @@ namespace ThFnsc.NFe
                 .AddDependencyInjectionConfigs()
                 .AddHttpClientsConfigs()
                 .AddContextConfigs(Configuration)
-                .AddGeneralConfigs(Environment);
+                .AddGeneralConfigs(Environment)
+                .AddHangfireConfigs(Configuration);
 
         public void Configure(
             IApplicationBuilder app,
@@ -48,6 +50,7 @@ namespace ThFnsc.NFe
                 endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHangfireDashboard("/HF");
             });
         }
     }
