@@ -1,0 +1,60 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject IJSRuntime _js
+@using ThFnsc.NFe.Models.MailTemplate
+
+<LoadableList Items="_list">
+    <TList Items="_list">
+        <TableHeader>
+            <td>Nome</td>
+            <td>Sujeito</td>
+            <td>Corpo</td>
+            <td>Ações</td>
+        </TableHeader>
+        <Row Context="item">
+            <td>@item.Name</td>
+            <td>@item.Subject</td>
+            <td>@item.Body</td>
+            <td>
+                <div class="btn btn-group">
+                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
+                    <button class="btn btn-danger btn-sm" @onclick="()=>DeleteAsync(item)"><span class="oi oi-trash"></span></button>
+                </div>
+            </td>
+        </Row>
+    </TList>
+</LoadableList>
+
+@code {
+    private List<MailTemplateModel> _list;
+
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
+    protected override Task OnInitializedAsync() =>
+        UpdateAsync();
+
+    public async Task UpdateAsync()
+    {
+        _list = null;
+        StateHasChanged();
+        _list = await _context.MailTemplates
+            .Active()
+            .ProjectTo<MailTemplateModel>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+        StateHasChanged();
+    }
+
+    public async Task DeleteAsync(MailTemplateModel item)
+    {
+        if (!await _js.InvokeAsync<bool>("confirm", "Tem certeza que deseja excluir esse template?"))
+            return;
+        var onDb = await _context.MailTemplates
+            .Active()
+            .OfId(item.Id)
+            .SingleAsync();
+        onDb.Delete();
+        await _context.SaveChangesAsync();
+        _list.Remove(item);
+    }
+}

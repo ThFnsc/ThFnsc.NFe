@@ -15,6 +15,8 @@ namespace ThFnsc.NFe.Data.Context
 
         public DbSet<Provider> Providers { get; set; }
 
+        public DbSet<MailTemplate> MailTemplates { get; set; }
+
         public NFContext(DbContextOptions<NFContext> options) : base(options) { }
     }
 }

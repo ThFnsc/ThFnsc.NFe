@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using System;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models;
 using ThFnsc.NFe.Models.Address;
+using ThFnsc.NFe.Models.MailTemplate;
 using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe
@@ -14,6 +16,13 @@ namespace ThFnsc.NFe
             DocumentMappings();
             AddressMappings();
             ProviderMappings();
+            MailTemplateMappings();
+        }
+
+        private void MailTemplateMappings()
+        {
+            CreateMap<MailTemplate, MailTemplateModel>();
+            CreateMap<MailTemplate, EditMailTemplateModel>();
         }
 
         private void ProviderMappings()

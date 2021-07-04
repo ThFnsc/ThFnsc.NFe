@@ -1,0 +1,12 @@
+﻿@page "/Templates"
+@attribute [PageDisplay(Name = "Templates", OpenIcon = "align-center")]
+@using ThFnsc.NFe.Pages.MailTemplate
+
+<EditMailTemplate @ref="_edit" OnUpdate="()=>_list.UpdateAsync()" />
+<hr />
+<MailTemplateList OnEdit="id=>_edit.EditAsync(id)" @ref="_list" />
+
+@code {
+    private EditMailTemplate _edit;
+    private MailTemplateList _list;
+}
