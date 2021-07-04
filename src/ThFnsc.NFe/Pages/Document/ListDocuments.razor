@@ -1,64 +1,77 @@
 ﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject IJSRuntime _js
 
-@if (_documents is null)
-{
-    <p>Carregando...</p>
-}
-else if (!_documents.Any())
-{
-    <p>Nenhum documento encontrado</p>
-}
-else
-{
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <td>Tipo</td>
-                <td>Número</td>
-                <td>Nome</td>
-                <td>Email</td>
-                <td>Logradouro</td>
-                <td>Número</td>
-                <td>Complemento</td>
-                <td>Cidade</td>
-                <td>Id cidade</td>
-                <td>Estado</td>
-                <td>Cod. postal</td>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var document in _documents)
-            {
-                <tr>
-                    <td>@document.DocType</td>
-                    <td>@document.DocIdentifier</td>
-                    <td>@document.Name</td>
-                    <td>@document.Email</td>
-                    <td>@document.Address.Street</td>
-                    <td>@document.Address.StreetNumber</td>
-                    <td>@document.Address.Complement</td>
-                    <td>@document.Address.City</td>
-                    <td>@document.Address.CityId</td>
-                    <td>@document.Address.State</td>
-                    <td>@document.Address.PostalCode</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<LoadableList Items="_list">
+    <TList Items="_list">
+        <TableHeader>
+            <td>Tipo</td>
+            <td>Número</td>
+            <td>Nome</td>
+            <td>Email</td>
+            <td>Logradouro</td>
+            <td>Número</td>
+            <td>Complemento</td>
+            <td>Cidade</td>
+            <td>Id cidade</td>
+            <td>Estado</td>
+            <td>Cod. postal</td>     
+            <td>Ações</td>
+        </TableHeader>
+        <Row Context="item">
+            <td>@item.DocType</td>
+            <td>@item.DocIdentifier</td>
+            <td>@item.Name</td>
+            <td>@item.Email</td>
+            <td>@item.Address.Street</td>
+            <td>@item.Address.StreetNumber</td>
+            <td>@item.Address.Complement</td>
+            <td>@item.Address.City</td>
+            <td>@item.Address.CityId</td>
+            <td>@item.Address.State</td>
+            <td>@item.Address.PostalCode</td>
+            <td>
+                <div class="btn btn-group">
+                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
+                    <button class="btn btn-danger btn-sm" @onclick="()=>DeleteAsync(item)"><span class="oi oi-trash"></span></button>
+                </div>
+            </td>
+        </Row>
+    </TList>
+</LoadableList>
 
 @code {
-    private List<Document> _documents;
+    private List<DocumentModel> _list;
 
-    protected override async Task OnInitializedAsync()
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
+    protected override Task OnInitializedAsync() =>
+        UpdateAsync();
+
+    public async Task UpdateAsync()
     {
-        _documents = await _context.Documents
+        _list = null;
+        StateHasChanged();
+        _list = await _context.Documents
             .Active()
             .Include(d => d.Address)
             .OrderByDescending(d => d.CreatedAt)
+            .ProjectTo<DocumentModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
+        StateHasChanged();
     }
 
-    public void AddDocument(Document document) =>
-        _documents.Insert(0, document);
+    public async Task DeleteAsync(DocumentModel document)
+    {
+        if (!await _js.InvokeAsync<bool>("confirm", "Tem certeza que deseja excluir esse documento?"))
+            return;
+        var onDb = await _context.Documents
+            .Active()
+            .OfId(document.Id)
+            .SingleAsync();
+        onDb.Delete();
+        await _context.SaveChangesAsync();
+        _list.Remove(document);
+    }
 }

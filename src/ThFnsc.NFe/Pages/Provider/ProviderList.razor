@@ -29,7 +29,7 @@
             </td>
             <td>
                 <div class="btn btn-group">
-                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
+                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEditSMTP.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
                     <button class="btn btn-danger btn-sm" @onclick="()=>DeleteAsync(item)"><span class="oi oi-trash"></span></button>
                 </div>
             </td>
@@ -41,7 +41,7 @@
     private List<SMTPModel> _list;
 
     [Parameter]
-    public EventCallback<int> OnEdit { get; set; }
+    public EventCallback<int> OnEditSMTP { get; set; }
 
     protected override Task OnInitializedAsync() =>
         UpdateAsync();
@@ -61,7 +61,7 @@
     {
         if (!await _js.InvokeAsync<bool>("confirm", "Tem certeza que deseja excluir esse servidor SMTP?"))
             return;
-        var onDb =await _context.SMTPs
+        var onDb = await _context.SMTPs
             .Active()
             .OfId(smtp.Id)
             .SingleAsync();

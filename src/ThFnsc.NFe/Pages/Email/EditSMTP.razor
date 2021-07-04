@@ -88,7 +88,7 @@ else
     }
 
     [Parameter]
-    public EventCallback OnSMTPUpdated { get; set; }
+    public EventCallback OnUpdate { get; set; }
 
     private async Task<bool> TestSMTPAsync()
     {
@@ -117,7 +117,7 @@ else
                 await _context.SaveChangesAsync();
                 _model = new();
                 _alert.Show(Alert.AlertTypes.Success, "Teste de SMTP efetuado com sucesso, modificações salvas!", "Salvo!");
-                await OnSMTPUpdated.InvokeAsync();
+                await OnUpdate.InvokeAsync();
             }
         }
         else
@@ -127,7 +127,7 @@ else
                 _editing.Update(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password ?? _editing.Password, _model.AccountName);
                 await _context.SaveChangesAsync();
                 _model = new();
-                await OnSMTPUpdated.InvokeAsync();
+                await OnUpdate.InvokeAsync();
             }
         }
         _processing = false;

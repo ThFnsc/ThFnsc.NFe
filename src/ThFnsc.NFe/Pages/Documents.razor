@@ -2,10 +2,11 @@
 @attribute [PageDisplay(Name = "Documentos", OpenIcon = "people")]
 @using ThFnsc.NFe.Pages.Document
 
-<CreateDocument OnDocumentAdded="d=>_list.AddDocument(d)" />
+<EditDocument OnUpdate="_=>_list.UpdateAsync()" @ref="_edit"/>
 <hr />
-<ListDocuments @ref="_list" />
+<ListDocuments @ref="_list" OnEdit="id=>_edit.EditAsync(id)" />
 
 @code {
     private ListDocuments _list;
+    private EditDocument _edit;
 }

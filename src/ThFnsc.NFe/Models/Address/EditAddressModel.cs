@@ -1,29 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ThFnsc.NFe.Models
+namespace ThFnsc.NFe.Models.Address
 {
-    public class DocumentModel
+    public class EditAddressModel
     {
-        public static readonly List<string> SupportedDocuments = new() { "CPF", "CNPJ" };
-
-        [Required]
-        [Display(Name = "Tipo")]
-        public string DocType { get; set; }
-
-        [Required]
-        [Display(Name = "Número")]
-        public string DocIdentifier { get; set; }
-
-        [Required]
-        [Display(Name = "Nome")]
-        public string Name { get; set; }
-
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [Display(Name = "Logradouro")]

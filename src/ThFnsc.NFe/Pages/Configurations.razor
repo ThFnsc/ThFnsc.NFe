@@ -2,9 +2,9 @@
 @attribute [PageDisplay(Name = "Configurações", OpenIcon = "wrench")]
 @using ThFnsc.NFe.Pages.Email
 
-<EditSMTP @ref="_editSmtp" OnSMTPUpdated="()=>_smtpList.UpdateAsync()"/>
+<EditSMTP @ref="_editSmtp" OnUpdate="()=>_smtpList.UpdateAsync()"/>
 <hr />
-<SMTPList OnEditSMTP="id=>_editSmtp.EditAsync(id)" @ref="_smtpList" />
+<SMTPList OnEdit="id=>_editSmtp.EditAsync(id)" @ref="_smtpList" />
 
 @code {
     private EditSMTP _editSmtp;
