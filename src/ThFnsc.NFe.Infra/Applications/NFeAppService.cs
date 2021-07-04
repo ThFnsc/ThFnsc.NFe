@@ -21,6 +21,17 @@ namespace ThFnsc.NFe.Infra.Applications
             _context = context;
         }
 
+        public async Task<IssuedNFe> DeleteAsync(int id)
+        {
+            var nf = await _context.NFes
+                .Active()
+                .OfId(id)
+                .SingleAsync();
+            nf.Delete();
+            await _context.SaveChangesAsync();
+            return nf;
+        }
+
         public async Task<IssuedNFe> IssueNFeAsync(
             int providerId,
             int toDocumentId,

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using System;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.MailTemplate;
+using ThFnsc.NFe.Models.NFe;
 using ThFnsc.NFe.Models.Provider;
 using ThFnsc.NFe.Models.ScheduledGeneration;
 using ThFnsc.NFe.Models.SMTP;
@@ -13,12 +15,18 @@ namespace ThFnsc.NFe
     {
         public MappingProfile()
         {
+            NFMappings();
             SMTPMappings();
             DocumentMappings();
             AddressMappings();
             ProviderMappings();
             MailTemplateMappings();
             ScheduledGenerationMappings();
+        }
+
+        private void NFMappings()
+        {
+            CreateMap<IssuedNFe, NFModel>();
         }
 
         private void ScheduledGenerationMappings()

@@ -1,6 +1,8 @@
-﻿@using ThFnsc.NFe.Data.Entities
-@inject ThFnsc.NFe.Data.Context.NFContext _context
+﻿@using ThFnsc.NFe.Models.NFe
+@inject NFContext _context
 @inject NavigationManager _navManager
+@inject IMapper _mapper
+@inject NFeAppService _nfe
 
 @if (_nfes == null)
 {
@@ -33,7 +35,7 @@ else
                         : "danger"
                     : "warning";
                 <tr class="table-@statusColor">
-                    <td>@nf.CreatedAt</td>
+                    <td>@nf.IssuedAt</td>
                     <td>@nf.Series</td>
                     <td>R$@nf.Value.ToString("0.00")</td>
                     <td>@nf.VerificationCode</td>
@@ -62,27 +64,25 @@ else
 }
 
 @code {
-    private List<IssuedNFe> _nfes;
+    private List<NFModel> _nfes;
 
     public void AddNFe(IssuedNFe nfe) =>
-        _nfes.Insert(0, nfe);
+        _nfes.Insert(0, _mapper.Map<NFModel>(nfe));
 
     protected override async Task OnInitializedAsync() 
     {
         _nfes = await _context.NFes
             .Active()
-            .Include(n => n.Provider)
-                .ThenInclude(p => p.Issuer)
-            .Include(n => n.DocumentTo)
             .OrderByDescending(n=>n.Success)
                 .ThenByDescending(n=>n.Series)
+            .ProjectTo<NFModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
 
-    private async Task DeleteAsync(IssuedNFe nfe)
+    private async Task DeleteAsync(NFModel nfe)
     {
-        nfe.Delete();
-        await _context.SaveChangesAsync();
+
+        await _nfe.DeleteAsync(nfe.Id);
         _nfes.Remove(nfe);
     }
 }
