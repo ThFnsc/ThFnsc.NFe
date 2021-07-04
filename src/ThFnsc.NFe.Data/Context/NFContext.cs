@@ -17,6 +17,8 @@ namespace ThFnsc.NFe.Data.Context
 
         public DbSet<MailTemplate> MailTemplates { get; set; }
 
+        public DbSet<ScheduledGeneration> ScheduledGenerations { get; set; }
+
         public NFContext(DbContextOptions<NFContext> options) : base(options) { }
     }
 }

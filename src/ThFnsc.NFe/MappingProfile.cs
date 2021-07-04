@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using System;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.MailTemplate;
 using ThFnsc.NFe.Models.Provider;
+using ThFnsc.NFe.Models.ScheduledGeneration;
 
 namespace ThFnsc.NFe
 {
@@ -17,6 +17,21 @@ namespace ThFnsc.NFe
             AddressMappings();
             ProviderMappings();
             MailTemplateMappings();
+            ScheduledGenerationMappings();
+        }
+
+        private void ScheduledGenerationMappings()
+        {
+            CreateMap<ScheduledGeneration, ScheduledGenerationModel>();
+
+            CreateMap<IssuedNFe, EditScheduledGenerationModel>()
+                .ForMember(m => m.ProviderId, res => res.MapFrom(m => m.Provider.Id))
+                .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.DocumentTo.Id));
+
+            CreateMap<ScheduledGeneration, EditScheduledGenerationModel>()
+                .ForMember(m => m.MailTemplateId, res => res.MapFrom(m => m.MailTemplate.Id))
+                .ForMember(m => m.ProviderId, res => res.MapFrom(m => m.Provider.Id))
+                .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.ToDocument.Id));
         }
 
         private void MailTemplateMappings()
