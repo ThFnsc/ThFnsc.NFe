@@ -1,0 +1,12 @@
+﻿@page "/Providers"
+@attribute [PageDisplay(Name = "Prestadores", OpenIcon = "briefcase")]
+@using ThFnsc.NFe.Pages.Provider
+
+<EditProvider @ref="_edit" OnUpdate="()=>_list.UpdateAsync()" />
+<hr />
+<ProviderList OnEdit="id=>_edit.EditAsync(id)" @ref="_list" />
+
+@code {
+    private EditProvider _edit;
+    private ProviderList _list;
+}

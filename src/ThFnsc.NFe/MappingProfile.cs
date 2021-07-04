@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using System;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models;
 using ThFnsc.NFe.Models.Address;
+using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe
 {
@@ -12,6 +14,15 @@ namespace ThFnsc.NFe
             SMTPMappings();
             DocumentMappings();
             AddressMappings();
+            ProviderMappings();
+        }
+
+        private void ProviderMappings()
+        {
+            CreateMap<Provider, ProviderModel>();
+            CreateMap<Provider, EditProviderModel>()
+                .ForMember(m => m.SMTPId, res => res.MapFrom(m => m.SMTP.Id))
+                .ForMember(m => m.DocumentId, res => res.MapFrom(m => m.Issuer.Id));
         }
 
         private void AddressMappings()

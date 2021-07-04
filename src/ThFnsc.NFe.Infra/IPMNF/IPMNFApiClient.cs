@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using ThFnsc.NFe.Data.Entities;
 
 namespace ThFnsc.NFe.Infra.IPMNF
 {
+    [Display(Name = "IPM Fiscal")]
     public class IPMNFApiClient : ITownHallApiClient
     {
         private readonly HttpClient _client;
