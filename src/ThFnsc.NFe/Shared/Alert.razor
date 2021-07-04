@@ -1,0 +1,66 @@
+﻿@if (Visible && (Title is not null || Description is not null))
+{
+    <div class="alert alert-@Type.ToString().ToLower()">
+        @if (Title is not null)
+        {
+            <h4 class="alert-heading">@Title</h4>
+        }
+        @if (Description is not null)
+        {
+            <p>@Description</p>
+        }
+    </div>
+}
+
+@code {
+    private CancellationTokenSource _cts;
+
+    [Parameter]
+    public string Title { get; set; }
+
+    public string Description { get; set; }
+
+    [Parameter]
+    public string Content { get; set; }
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public AlertTypes Type { get; set; }
+
+    public enum AlertTypes { Primary, Secondary, Success, Danger, Warning, Info, Light, Dark }
+
+    public void Show()
+    {
+        Visible = true;
+        StateHasChanged();
+    }
+
+    public void Show(AlertTypes type, string description, string title = null, TimeSpan? timeout = null)
+    {
+        Type = type;
+        Description = description;
+        Title = title;
+        try { _cts?.Cancel(); } catch { }
+        Show();
+        if (timeout.HasValue)
+        {
+            var source = new CancellationTokenSource();
+            _cts = source;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(timeout.Value, source.Token);
+                if (!source.IsCancellationRequested)
+                    await InvokeAsync(Hide);
+                source.Dispose();
+            });
+        }
+    }
+
+    public void Hide()
+    {
+        Visible = false;
+        StateHasChanged();
+    }
+}

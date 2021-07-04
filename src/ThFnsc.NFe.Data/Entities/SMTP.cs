@@ -7,7 +7,7 @@ namespace ThFnsc.NFe.Data.Entities
     {
         public string Host { get; private set; }
 
-        public ushort Port { get; private set; }
+        public int Port { get; private set; }
 
         public bool UseEncryption { get; private set; }
 
@@ -21,7 +21,17 @@ namespace ThFnsc.NFe.Data.Entities
 
         public SMTP(
             string host,
-            ushort port,
+            int port,
+            bool useEncryption,
+            string account,
+            string username,
+            string password,
+            string accountName) =>
+            Update(host, port, useEncryption, account, username, password, accountName);
+
+        public void Update(
+            string host,
+            int port,
             bool useEncryption,
             string account,
             string username,

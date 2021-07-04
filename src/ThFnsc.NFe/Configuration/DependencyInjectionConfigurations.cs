@@ -11,6 +11,7 @@ namespace ThFnsc.NFe.Configuration
         {
             services.AddSingleton<ITownHallApiClient, IPMNFApiClient>();
             services.AddScoped<NFeAppService>();
+            services.AddScoped<SMTPAppService>();
             return services;
         }
     }

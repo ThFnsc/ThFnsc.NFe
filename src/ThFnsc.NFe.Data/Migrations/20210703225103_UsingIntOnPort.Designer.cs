@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ThFnsc.NFe.Data.Context;
 
 namespace ThFnsc.NFe.Data.Migrations
 {
     [DbContext(typeof(NFContext))]
-    partial class NFContextModelSnapshot : ModelSnapshot
+    [Migration("20210703225103_UsingIntOnPort")]
+    partial class UsingIntOnPort
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,0 +1,12 @@
+﻿@page "/Confs"
+@attribute [PageDisplay(Name = "Configurações", OpenIcon = "wrench")]
+@using ThFnsc.NFe.Pages.Email
+
+<EditSMTP @ref="_editSmtp" OnSMTPUpdated="()=>_smtpList.UpdateAsync()"/>
+<hr />
+<SMTPList OnEditSMTP="id=>_editSmtp.EditAsync(id)" @ref="_smtpList" />
+
+@code {
+    private EditSMTP _editSmtp;
+    private SMTPList _smtpList;
+}

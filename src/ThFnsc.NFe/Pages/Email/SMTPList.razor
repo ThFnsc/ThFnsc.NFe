@@ -1,0 +1,72 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject IJSRuntime _js
+
+<LoadableList Items="_list">
+    <TList Items="_list">
+        <TableHeader>
+            <td>Nome</td>
+            <td>Conta</td>
+            <td>Server</td>
+            <td>Usuário</td>
+            <td>Criptografia</td>
+            <td>Ações</td>
+        </TableHeader>
+        <Row Context="item">
+            <td>@item.AccountName</td>
+            <td>@item.Account</td>
+            <td>@item.Host:@item.Port</td>
+            <td>@item.Username</td>
+            <td>
+                @if (item.UseEncryption)
+                {
+                    <span class="oi oi-lock-locked text-success"></span>
+                }
+                else
+                {
+                    <span class="oi oi-lock-unlocked text-danger"></span>
+                }
+            </td>
+            <td>
+                <div class="btn btn-group">
+                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEditSMTP.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
+                    <button class="btn btn-danger btn-sm" @onclick="()=>DeleteAsync(item)"><span class="oi oi-trash"></span></button>
+                </div>
+            </td>
+        </Row>
+    </TList>
+</LoadableList>
+
+@code {
+    private List<SMTPModel> _list;
+
+    [Parameter]
+    public EventCallback<int> OnEditSMTP { get; set; }
+
+    protected override Task OnInitializedAsync() =>
+        UpdateAsync();
+
+    public async Task UpdateAsync()
+    {
+        _list = null;
+        StateHasChanged();
+        _list = await _context.SMTPs
+            .Active()
+            .ProjectTo<SMTPModel>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+        StateHasChanged();
+    }
+
+    public async Task DeleteAsync(SMTPModel smtp)
+    {
+        if (!await _js.InvokeAsync<bool>("confirm", "Tem certeza que deseja excluir esse servidor SMTP?"))
+            return;
+        var onDb =await _context.SMTPs
+            .Active()
+            .OfId(smtp.Id)
+            .SingleAsync();
+        onDb.Delete();
+        await _context.SaveChangesAsync();
+        _list.Remove(smtp);
+    }
+}

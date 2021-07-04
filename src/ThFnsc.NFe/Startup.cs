@@ -31,7 +31,7 @@ namespace ThFnsc.NFe
                 .AddGeneralConfigs(Environment);
 
         public void Configure(
-            IApplicationBuilder app, 
+            IApplicationBuilder app,
             IWebHostEnvironment env,
             NFContext context)
         {

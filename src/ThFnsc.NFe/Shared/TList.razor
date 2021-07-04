@@ -1,0 +1,41 @@
+﻿@typeparam TItem
+
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            @TableHeader
+        </tr>
+    </thead>
+    <tbody>
+        @if (Each is null)
+        {
+            foreach (var item in Items)
+            {
+                <tr>
+                    @Row(item)
+                </tr>
+            }
+        }
+        else
+        {
+            foreach (var item in Items)
+            {
+                @Row(item)
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    public RenderFragment TableHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> Row { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> Each { get; set; }
+}
