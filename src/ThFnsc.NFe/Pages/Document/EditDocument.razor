@@ -32,8 +32,6 @@ else
                 <LabelFor For="() => _model.Email" />
                 <InputText @bind-Value="_model.Email" class="form-control" />
             </div>
-        </div>
-        <div class="row mt-2">
             <div class="col-lg-2">
                 <LabelFor For="() => _model.Address.Street" />
                 <InputText @bind-Value="_model.Address.Street" class="form-control" />
@@ -67,17 +65,17 @@ else
                 <InputText @bind-Value="_model.Address.PostalCode" class="form-control" />
             </div>
         </div>
-        @if (_model.Id == 0)
-        {
-            <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
-        }
-        else
-        {
-            <div class="btn-group">
+        <div class="btn-group mt-3">
+            @if (_model.Id == 0)
+            {
+                <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+            }
+            else
+            {
                 <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
                 <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
-            </div>
-        }
+            }
+        </div>
     </EditForm>
 }
 
