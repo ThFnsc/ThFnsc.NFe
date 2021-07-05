@@ -11,6 +11,10 @@ namespace ThFnsc.NFe.Configuration
         {
             services.AddDbContext<NFContext>(opt =>
                 opt.UseMySQL(configuration.GetConnectionString("Default")));
+
+            using var sp = services.BuildServiceProvider();
+            sp.GetRequiredService<NFContext>().Database.Migrate();
+
             return services;
         }
     }

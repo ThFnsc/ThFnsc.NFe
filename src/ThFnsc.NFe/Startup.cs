@@ -34,10 +34,8 @@ namespace ThFnsc.NFe
 
         public void Configure(
             IApplicationBuilder app,
-            IWebHostEnvironment env,
-            NFContext context)
+            IWebHostEnvironment env)
         {
-            context.Database.Migrate();
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
