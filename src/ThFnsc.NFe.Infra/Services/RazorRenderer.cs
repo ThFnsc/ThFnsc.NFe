@@ -1,19 +1,14 @@
-﻿using RazorLight;
+﻿using RazorEngine;
+using RazorEngine.Templating;
 using System.Threading.Tasks;
 
 namespace ThFnsc.NFe.Infra.Services
 {
     public static class RazorRenderer
     {
-        public static async Task<string> RenderAsync<T>(string templateKey, string template, T model)
+        public static async Task<string> RenderAsync(string templateKey, string template, object model)
         {
-            var engine = new RazorLightEngineBuilder()
-                .UseEmbeddedResourcesProject(typeof(RazorRenderer))
-                .SetOperatingAssembly(typeof(RazorRenderer).Assembly)
-                .UseMemoryCachingProvider()
-                .Build();
-
-            string result = await engine.CompileRenderStringAsync(templateKey, template, model);
+            var result = Engine.Razor.RunCompile(template, templateKey, null, model);
             return result;
         }
     }

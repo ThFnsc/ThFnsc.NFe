@@ -60,6 +60,7 @@ namespace ThFnsc.NFe.Infra.Applications
             await _smtp.SendMailAsync(nf.Provider.SMTP.Id, async msg => msg
                 .To(new[] { nf.Provider.SMTP.Account }
                     .Concat(additionalAddresses ?? Array.Empty<string>())
+                    .Distinct()
                     .Select(m => new FluentEmail.Core.Models.Address(m, null)))
                 .Subject(await RazorRenderer.RenderAsync($"mt-{template.Id}-s", template.Subject, nf))
                 .Body(await RazorRenderer.RenderAsync($"mt-{template.Id}-b", template.Body, nf), true)
