@@ -1,9 +1,9 @@
 ﻿using SelectPdf;
 using System.IO;
 
-namespace ThFnsc.NFe.Infra
+namespace ThFnsc.NFe.Infra.Services
 {
-    public class HtmlToPDF
+    public static class HtmlToPDF
     {
         public static MemoryStream ConvertHTMLToPDF(string html)
         {

@@ -95,7 +95,7 @@ else
     {
         try
         {
-            await _smtp.TestSMTP(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password ?? _editing.Password, _model.AccountName);
+            await SMTPAppService.TestSMTPAsync(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password ?? _editing.Password, _model.AccountName);
             return true;
         }
         catch (Exception e)

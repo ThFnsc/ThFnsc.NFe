@@ -35,9 +35,12 @@ namespace ThFnsc.NFe.Infra.Applications
                 .SingleAsync();
 
             throw new NotImplementedException($"{id} Still experimental");
+
             var nfe = await _nfe.IssueNFeAsync(sg.Provider.Id, sg.ToDocument.Id, sg.Value, sg.ServiceId, sg.ServiceDescription, sg.AliquotPercentage);
             if (!nfe.Success.Value)
                 throw new Exception(nfe.ErrorMessage);
+            if (sg.MailTemplate is not null)
+                await _nfe.MailToAsync(nfe.Id, sg.MailTemplate.Id, sg.MailList?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
             return nfe;
         }
 

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Infra.Services;
 
 namespace ThFnsc.NFe.Infra.IPMNF
 {
