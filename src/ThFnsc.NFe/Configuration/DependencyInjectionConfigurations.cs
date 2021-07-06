@@ -16,6 +16,7 @@ namespace ThFnsc.NFe.Configuration
             services.AddScoped<ScheduledGenerationAppService>();
 
             services.AddSingleton<IHtmlToPDF, HtmlToPDF>();
+            services.AddSingleton<IRazorRenderer, RazorRenderer>();
             return services;
         }
     }

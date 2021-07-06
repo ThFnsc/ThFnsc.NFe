@@ -1,15 +1,16 @@
 ﻿using RazorEngine;
 using RazorEngine.Templating;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Services;
 
 namespace ThFnsc.NFe.Infra.Services
 {
-    public static class RazorRenderer
+    public class RazorRenderer : IRazorRenderer
     {
-        public static async Task<string> RenderAsync(string templateKey, string template, object model)
+        public Task<string> RenderAsync(string templateKey, string template, object model)
         {
             var result = Engine.Razor.RunCompile(template, templateKey, null, model);
-            return result;
+            return Task.FromResult(result);
         }
     }
 }
