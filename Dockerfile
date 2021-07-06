@@ -1,28 +1,22 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 #Install nodejs, npm and chromium to use at runtime
 RUN apt-get update
-RUN apt-get install -y wget nodejs npm gnupg ca-certificates procps libxss1
+RUN apt-get install -y curl wget gnupg ca-certificates procps libxss1
+RUN curl -sL https://deb.nodesource.com/setup_4.x | bash
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 RUN apt-get update
-RUN apt-get install -y google-chrome-stable
-RUN rm -rf /var/lib/apt/lists/*
-#Upgrade to the latest LTS node version
-RUN npm i -g n
-RUN n lts
+RUN apt-get install -y google-chrome-stable nodejs npm
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS publish
 #Install nodejs, npm and chromium to use on tests
 RUN apt-get update
-RUN apt-get install -y wget nodejs npm gnupg ca-certificates procps libxss1
+RUN apt-get install -y curl wget gnupg ca-certificates procps libxss1
+RUN curl -sL https://deb.nodesource.com/setup_4.x | bash
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 RUN apt-get update
-RUN apt-get install -y google-chrome-stable
-RUN rm -rf /var/lib/apt/lists/*
-#Upgrade to the latest LTS node version
-RUN npm i -g n
-RUN n lts
+RUN apt-get install -y google-chrome-stable nodejs npm
 #Build main application
 WORKDIR /src
 COPY ThFnsc.NFe.sln .
