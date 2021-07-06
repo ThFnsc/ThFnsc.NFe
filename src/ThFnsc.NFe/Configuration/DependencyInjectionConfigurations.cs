@@ -2,6 +2,7 @@
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Infra.Applications;
 using ThFnsc.NFe.Infra.IPMNF;
+using ThFnsc.NFe.Infra.Services;
 
 namespace ThFnsc.NFe.Configuration
 {
@@ -13,6 +14,8 @@ namespace ThFnsc.NFe.Configuration
             services.AddScoped<NFeAppService>();
             services.AddScoped<SMTPAppService>();
             services.AddScoped<ScheduledGenerationAppService>();
+
+            services.AddSingleton<IHtmlToPDF, HtmlToPDF>();
             return services;
         }
     }

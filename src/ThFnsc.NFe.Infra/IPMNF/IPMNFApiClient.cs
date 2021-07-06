@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Entities;
-using ThFnsc.NFe.Infra.Services;
 
 namespace ThFnsc.NFe.Infra.IPMNF
 {
@@ -15,10 +14,14 @@ namespace ThFnsc.NFe.Infra.IPMNF
     public class IPMNFApiClient : ITownHallApiClient
     {
         private readonly HttpClient _client;
+        private readonly IHtmlToPDF _htmlToPDF;
 
-        public IPMNFApiClient(HttpClient client)
+        public IPMNFApiClient(
+            HttpClient client,
+            IHtmlToPDF htmlToPDF)
         {
             _client = client;
+            _htmlToPDF = htmlToPDF;
         }
 
         private (int series, string verifCode) ParseReturnedHTML(string html)
@@ -92,6 +95,16 @@ namespace ThFnsc.NFe.Infra.IPMNF
 
             try
             {
+                response.ReturnedPDF = await _htmlToPDF.ConvertHTMLToPDF(response.RawResponse);
+            }
+            catch (Exception e)
+            {
+                response.Error = e;
+                return response;
+            }
+
+            try
+            {
                 (response.Series, response.VerificationCode) = ParseReturnedHTML(response.RawResponse);
             }
             catch (Exception e)
@@ -103,16 +116,6 @@ namespace ThFnsc.NFe.Infra.IPMNF
             try
             {
                 response.ReturnedXML = await PostAsync(GetXMLXML(response.VerificationCode), nfe, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php?formato_saida=2&eletron=1");
-            }
-            catch (Exception e)
-            {
-                response.Error = e;
-                return response;
-            }
-
-            try
-            {
-                response.ReturnedPDF = HtmlToPDF.ConvertHTMLToPDF(response.RawResponse).ToArray();
             }
             catch (Exception e)
             {

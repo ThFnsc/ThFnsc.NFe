@@ -1,7 +1,29 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
-WORKDIR /app
+#Install nodejs, npm and chromium to use at runtime
+RUN apt-get update
+RUN apt-get install -y wget nodejs npm gnupg ca-certificates procps libxss1
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+RUN apt-get update
+RUN apt-get install -y google-chrome-stable
+RUN rm -rf /var/lib/apt/lists/*
+#Upgrade to the latest LTS node version
+RUN npm i -g n
+RUN n lts
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS publish
+#Install nodejs, npm and chromium to use on tests
+RUN apt-get update
+RUN apt-get install -y wget nodejs npm gnupg ca-certificates procps libxss1
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+RUN apt-get update
+RUN apt-get install -y google-chrome-stable
+RUN rm -rf /var/lib/apt/lists/*
+#Upgrade to the latest LTS node version
+RUN npm i -g n
+RUN n lts
+#Build main application
 WORKDIR /src
 COPY ThFnsc.NFe.sln .
 COPY src/ThFnsc.NFe/ThFnsc.NFe.csproj src/ThFnsc.NFe/
@@ -16,6 +38,7 @@ RUN dotnet test --no-build -c Release
 RUN dotnet publish --no-build -c Release -o /app/publish
 
 FROM base AS final
+#Get everything
 EXPOSE 80
 WORKDIR /app
 COPY --from=publish /app/publish/runtimes ./runtimes
