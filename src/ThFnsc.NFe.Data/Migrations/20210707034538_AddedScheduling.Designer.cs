@@ -9,8 +9,8 @@ using ThFnsc.NFe.Data.Context;
 namespace ThFnsc.NFe.Data.Migrations
 {
     [DbContext(typeof(NFContext))]
-    [Migration("20210704051320_AddedScheduledGenerations")]
-    partial class AddedScheduledGenerations
+    [Migration("20210707034538_AddedScheduling")]
+    partial class AddedScheduling
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -137,6 +137,12 @@ namespace ThFnsc.NFe.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ReturnedContent")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("ReturnedPDF")
+                        .HasColumnType("MEDIUMBLOB");
+
+                    b.Property<string>("ReturnedXMLContent")
                         .HasColumnType("text");
 
                     b.Property<string>("SentContent")

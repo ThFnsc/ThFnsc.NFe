@@ -1,13 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
-using System;
 
 namespace ThFnsc.NFe.Data.Migrations
 {
-    public partial class AddedScheduledGenerations : Migration
+    public partial class AddedScheduling : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterColumn<int>(
+                name: "Port",
+                table: "SMTPs",
+                type: "int",
+                nullable: false,
+                oldClrType: typeof(short),
+                oldType: "smallint unsigned");
+
+            migrationBuilder.AddColumn<byte[]>(
+                name: "ReturnedPDF",
+                table: "NFes",
+                type: "MEDIUMBLOB",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "ReturnedXMLContent",
+                table: "NFes",
+                type: "text",
+                nullable: true);
+
+            migrationBuilder.CreateTable(
+                name: "MailTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(767)", nullable: true),
+                    Subject = table.Column<string>(type: "text", nullable: true),
+                    Body = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MailTemplates", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "ScheduledGenerations",
                 columns: table => new
@@ -51,6 +88,21 @@ namespace ThFnsc.NFe.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_MailTemplates_CreatedAt",
+                table: "MailTemplates",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MailTemplates_DeletedAt",
+                table: "MailTemplates",
+                column: "DeletedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MailTemplates_Name",
+                table: "MailTemplates",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ScheduledGenerations_CreatedAt",
                 table: "ScheduledGenerations",
                 column: "CreatedAt");
@@ -85,6 +137,25 @@ namespace ThFnsc.NFe.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ScheduledGenerations");
+
+            migrationBuilder.DropTable(
+                name: "MailTemplates");
+
+            migrationBuilder.DropColumn(
+                name: "ReturnedPDF",
+                table: "NFes");
+
+            migrationBuilder.DropColumn(
+                name: "ReturnedXMLContent",
+                table: "NFes");
+
+            migrationBuilder.AlterColumn<short>(
+                name: "Port",
+                table: "SMTPs",
+                type: "smallint unsigned",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "int");
         }
     }
 }
