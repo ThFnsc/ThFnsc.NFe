@@ -3,15 +3,12 @@
     if (Button)
     {
         <span class="spinner-@Type.ToString().ToLower() spinner-@Type.ToString().ToLower()-sm" role="status"></span>
-        <span class="sr-only">Loading...</span>
     }
     else
     {
         <div @attributes="@AdditionalAttributes">
             <div class="text-@Align text-@Color">
-                <div class="spinner-@Type.ToString().ToLower()" style="width: @(Size)rem; height: @(Size)rem;" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
+                <div class="spinner-@Type.ToString().ToLower()" style="width: @(Size)rem; height: @(Size)rem;" role="status"></div>
             </div>
         </div>
     }

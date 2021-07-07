@@ -9,73 +9,85 @@
 }
 else
 {
-    <EditForm Model="_model" OnValidSubmit="SaveAsync">
-        <div class="row">
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.DocType" />
-                <InputSelect @bind-Value="_model.DocType" class="form-control">
-                    <option value="">Selecionar</option>
-                    @foreach (var docType in EditDocumentModel.SupportedDocuments)
-                        {
-                        <option value="@docType">@docType</option>
-                        }
-                </InputSelect>
-            </div>
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.DocIdentifier" />
-                <InputText @bind-Value="_model.DocIdentifier" class="form-control" />
-            </div>
-            <div class="col-lg-4">
-                <LabelFor For="() => _model.Name" />
-                <InputText @bind-Value="_model.Name" class="form-control" />
-            </div>
-            <div class="col-lg-4">
-                <LabelFor For="() => _model.Email" />
-                <InputText @bind-Value="_model.Email" class="form-control" />
-            </div>
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.Address.Street" />
-                <InputText @bind-Value="_model.Address.Street" class="form-control" />
-            </div>
-            <div class="col-lg-1">
-                <LabelFor For="() => _model.Address.StreetNumber" />
-                <InputText @bind-Value="_model.Address.StreetNumber" class="form-control" />
-            </div>
-            <div class="col-lg-1">
-                <LabelFor For="() => _model.Address.Complement" />
-                <InputText @bind-Value="_model.Address.Complement" class="form-control" />
-            </div>
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.Address.Neighborhood" />
-                <InputText @bind-Value="_model.Address.Neighborhood" class="form-control" />
-            </div>
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.Address.City" />
-                <InputText @bind-Value="_model.Address.City" class="form-control" />
-            </div>
-            <div class="col-lg-1">
-                <LabelFor For="() => _model.Address.CityId" />
-                <InputNumber @bind-Value="_model.Address.CityId" class="form-control" />
-            </div>
-            <div class="col-lg-1">
-                <LabelFor For="() => _model.Address.State" />
-                <InputText @bind-Value="_model.Address.State" class="form-control" />
-            </div>
-            <div class="col-lg-2">
-                <LabelFor For="() => _model.Address.PostalCode" />
-                <InputText @bind-Value="_model.Address.PostalCode" class="form-control" />
-            </div>
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.DocType" />
+            <InputSelect @bind-Value="_model.DocType" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var docType in EditDocumentModel.SupportedDocuments)
+                    {
+                    <option value="@docType">@docType</option>
+                    }
+            </InputSelect>
         </div>
-        <div class="btn-group mt-3">
-            @if (_model.Id == 0)
-            {
-                <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
-            }
-            else
-            {
-                <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
-                <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
-            }
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.DocIdentifier" />
+            <InputText @bind-Value="_model.DocIdentifier" class="form-control" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Name" />
+            <InputText @bind-Value="_model.Name" class="form-control" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Email" />
+            <InputText @bind-Value="_model.Email" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.Street" />
+            <InputText @bind-Value="_model.Address.Street" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.StreetNumber" />
+            <InputText @bind-Value="_model.Address.StreetNumber" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.Complement" />
+            <InputText @bind-Value="_model.Address.Complement" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.Neighborhood" />
+            <InputText @bind-Value="_model.Address.Neighborhood" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.City" />
+            <InputText @bind-Value="_model.Address.City" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.CityId" />
+            <InputNumber @bind-Value="_model.Address.CityId" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.State" />
+            <InputText @bind-Value="_model.Address.State" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.PostalCode" />
+            <InputText @bind-Value="_model.Address.PostalCode" class="form-control" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
         </div>
     </EditForm>
 }

@@ -10,120 +10,103 @@
 }
 else
 {
-    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
         <DataAnnotationsValidator />
-        <div class="row mb-3">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.CronPattern" />
-                    <InputText @bind-Value="_model.CronPattern" placeholder="0 10 1 * *" class="form-control" />
-                    <ValidationMessage For="()=>_model.CronPattern" />
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.MailList" />
-                    <InputText @bind-Value="_model.MailList" placeholder="Apenas para mim" class="form-control" />
-                    <ValidationMessage For="()=>_model.MailList" />
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.MailTemplateId" />
-                    <InputSelect @bind-Value="_model.MailTemplateId" class="form-control">
-                        <option value="">Não enviar e-mail</option>
-                        @foreach (var doc in _templates)
-                            {
-                            <option value="@doc.Key">@doc.Value</option>
-                            }
-                    </InputSelect>
-                    <ValidationMessage For="()=>_model.MailTemplateId" />
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <LabelFor For="() => _model.ProviderId" />
-                    <InputSelect @bind-Value="_model.ProviderId" class="form-control">
-                        <option value="">Selecionar</option>
-                        @foreach (var doc in _providers)
-                            {
-                            <option value="@doc.Key">@doc.Value</option>
-                            }
-                    </InputSelect>
-                    <ValidationMessage For="()=>_model.ProviderId" />
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <LabelFor For="() => _model.ToDocumentId" />
-                    <InputSelect @bind-Value="_model.ToDocumentId" class="form-control">
-                        <option value="">Selecionar</option>
-                        @foreach (var doc in _documents)
-                            {
-                            <option value="@doc.Key">@doc.Value</option>
-                            }
-                    </InputSelect>
-                    <ValidationMessage For="()=>_model.ToDocumentId" />
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.Value" />
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1">R$</span>
-                        </div>
-                        <InputNumber @bind-Value="_model.Value" class="form-control" />
-                    </div>
-                    <ValidationMessage For="()=>_model.Value" />
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.ServiceId" />
-                    <InputNumber @bind-Value="_model.ServiceId" class="form-control" />
-                    <ValidationMessage For="()=>_model.ServiceId" />
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <LabelFor For="() => _model.AliquotPercentage" />
-                    <div class="input-group">
-                        <InputNumber @bind-Value="_model.AliquotPercentage" class="form-control" />
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon1">%</span>
-                        </div>
-                    </div>
-                    <ValidationMessage For="()=>_model.AliquotPercentage" />
-                </div>
-            </div>
-
-            <div class="col-lg-12">
-                <div class="form-group">
-                    <LabelFor For="() => _model.ServiceDescription" />
-                    <InputText @bind-Value="_model.ServiceDescription" class="form-control" />
-                    <ValidationMessage For="()=>_model.ServiceDescription" />
-                </div>
-            </div>
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.CronPattern" />
+            <InputText @bind-Value="_model.CronPattern" placeholder="0 10 1 * *" class="form-control" />
+            <ValidationMessage For="()=>_model.CronPattern" />
         </div>
-        <div class="btn-group">
-            <UpdateSchedulesButton />
-            @if (_model.Id == 0)
-            {
-                <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
-            }
-            else
-            {
-                <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
-                <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
-            }
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.MailList" />
+            <InputText @bind-Value="_model.MailList" placeholder="Apenas para mim" class="form-control" />
+            <ValidationMessage For="()=>_model.MailList" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.MailTemplateId" />
+            <InputSelect @bind-Value="_model.MailTemplateId" class="form-control">
+                <option value="">Não enviar e-mail</option>
+                @foreach (var doc in _templates)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.MailTemplateId" />
+        </div>
+
+        <div class="col-lg-6">
+            <LabelFor For="() => _model.ProviderId" />
+            <InputSelect @bind-Value="_model.ProviderId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var doc in _providers)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.ProviderId" />
+        </div>
+
+        <div class="col-lg-6">
+            <LabelFor For="() => _model.ToDocumentId" />
+            <InputSelect @bind-Value="_model.ToDocumentId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var doc in _documents)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.ToDocumentId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Value" />
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">R$</span>
+                </div>
+                <InputNumber @bind-Value="_model.Value" class="form-control" />
+            </div>
+            <ValidationMessage For="()=>_model.Value" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.ServiceId" />
+            <InputNumber @bind-Value="_model.ServiceId" class="form-control" />
+            <ValidationMessage For="()=>_model.ServiceId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.AliquotPercentage" />
+            <div class="input-group">
+                <InputNumber @bind-Value="_model.AliquotPercentage" class="form-control" />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon1">%</span>
+                </div>
+            </div>
+            <ValidationMessage For="()=>_model.AliquotPercentage" />
+        </div>
+
+        <div class="col-12">
+            <LabelFor For="() => _model.ServiceDescription" />
+            <InputText @bind-Value="_model.ServiceDescription" class="form-control" />
+            <ValidationMessage For="()=>_model.ServiceDescription" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                <UpdateSchedulesButton />
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
         </div>
     </EditForm>
 }

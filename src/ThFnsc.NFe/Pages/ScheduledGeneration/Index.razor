@@ -1,6 +1,5 @@
 ﻿@page "/ScheduledGenerations"
 @attribute [PageDisplay(Name = "Agendamentos", OpenIcon = "calendar")]
-@using ThFnsc.NFe.Pages.ScheduledGeneration
 
 <EditScheduledGeneration @ref="_edit" OnUpdate="()=>_list.UpdateAsync()" />
 <hr />

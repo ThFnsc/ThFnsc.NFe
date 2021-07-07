@@ -8,36 +8,46 @@
 }
 else
 {
-    <EditForm Model="_model" OnValidSubmit="SaveAsync">
-        <DataAnnotationsValidator/>
-        <div class="mb-3">
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <DataAnnotationsValidator />
+        <div class="col-12">
             <div class="form-group">
                 <LabelFor For="()=>_model.Name" />
                 <InputText @bind-Value="_model.Name" class="form-control" />
                 <ValidationMessage For="()=>_model.Name" />
             </div>
+        </div>
+
+        <div class="col-12">
             <div class="form-group">
                 <LabelFor For="()=>_model.Subject" />
                 <InputTextArea @bind-Value="_model.Subject" class="form-control" />
                 <ValidationMessage For="()=>_model.Subject" />
             </div>
+        </div>
+
+        <div class="col-12">
             <div class="form-group">
                 <LabelFor For="()=>_model.Body" />
                 <InputTextArea @bind-Value="_model.Body" class="form-control" />
                 <ValidationMessage For="()=>_model.Body" />
             </div>
         </div>
-        @if (_model.Id == 0)
-        {
-            <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
-        }
-        else
-        {
+
+        <div class="col-12">
             <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
-                <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
             </div>
-        }
+        </div>
     </EditForm>
 }
 
@@ -70,7 +80,7 @@ else
             _context.Add(new MailTemplate(_model.Name, _model.Subject, _model.Body));
         else
             _editing.Update(_model.Name, _model.Subject, _model.Body);
-        
+
         await _context.SaveChangesAsync();
         _model = new();
         await OnUpdate.InvokeAsync();
