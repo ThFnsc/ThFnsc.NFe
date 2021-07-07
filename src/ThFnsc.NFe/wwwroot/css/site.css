@@ -49,6 +49,6 @@ a, .btn-link {
         top: 0.5rem;
     }
 
-.components-reconnect-modal{
-    color:black;
+#components-reconnect-modal{
+    background-color:black!important;
 }
