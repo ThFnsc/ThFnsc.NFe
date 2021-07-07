@@ -1,13 +1,13 @@
 ﻿@typeparam TItem
 
-<table class="table table-hover table-striped">
+<table class="table table-hover table-striped table-dark">
     <thead>
         <tr>
             @TableHeader
         </tr>
     </thead>
     <tbody>
-        @if (Each is null)
+        @if (Row is not null)
         {
             foreach (var item in Items)
             {
@@ -20,7 +20,7 @@
         {
             foreach (var item in Items)
             {
-                @Row(item)
+                @Each(item)
             }
         }
     </tbody>
