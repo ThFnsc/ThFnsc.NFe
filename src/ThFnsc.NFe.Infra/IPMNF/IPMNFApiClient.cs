@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Infra.IPMNF.Models;
 
 namespace ThFnsc.NFe.Infra.IPMNF
 {
@@ -15,6 +16,10 @@ namespace ThFnsc.NFe.Infra.IPMNF
     {
         private readonly HttpClient _client;
         private readonly IHtmlToPDF _htmlToPDF;
+
+        public Type ModelType => typeof(DataModel);
+
+        public object DefaultModelData => DataModel.Example();
 
         public IPMNFApiClient(
             HttpClient client,

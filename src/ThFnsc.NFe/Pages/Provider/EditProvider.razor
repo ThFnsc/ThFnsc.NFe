@@ -1,9 +1,11 @@
 ﻿@inject NFContext _context
 @inject IMapper _mapper
 @inject SMTPAppService _smtp
+@inject IEnumerable<ITownHallApiClient> _apiClients
 @using ThFnsc.NFe.Models.Provider
 @using System.Reflection
 @using ThFnsc.NFe.Core.Services
+@using System.Text.Json
 
 @if (_model is null || _documents is null || _smtps is null)
 {
@@ -11,47 +13,54 @@
 }
 else
 {
-    <EditForm Model="_model" OnValidSubmit="SaveAsync">
-        <DataAnnotationsValidator/>
+    <EditForm EditContext="_editContext" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
         <div class="row mb-3">
-            <div class="col-lg-4">
-                <LabelFor For="() => _model.DocumentId" />
-                <InputSelect @bind-Value="_model.DocumentId" class="form-control">
-                    <option value="">Selecionar</option>
-                    @foreach (var item in _documents)
-                        {
-                        <option value="@item.Key">@item.Value</option>
-                        }
-                </InputSelect>
-                <ValidationMessage For="()=>_model.DocumentId"/>
+            <div class="col-xs-12 col-lg-4">
+                <div class="form-group">
+                    <LabelFor For="() => _model.DocumentId" />
+                    <InputSelect @bind-Value="_model.DocumentId" class="form-control">
+                        <option value="">Selecionar</option>
+                        @foreach (var item in _documents)
+                            {
+                            <option value="@item.Key">@item.Value</option>
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="()=>_model.DocumentId" />
+                </div>
             </div>
-            <div class="col-lg-4">
-                <LabelFor For="() => _model.SMTPId" />
-                <InputSelect @bind-Value="_model.SMTPId" class="form-control">
-                    <option value="">Selecionar</option>
-                    @foreach (var item in _smtps)
-                        {
-                        <option value="@item.Key">@item.Value</option>
-                        }
-                </InputSelect>
-                <ValidationMessage For="()=>_model.SMTPId" />
+            <div class="col-xs-12 col-lg-4">
+                <div class="form-group">
+                    <LabelFor For="() => _model.SMTPId" />
+                    <InputSelect @bind-Value="_model.SMTPId" class="form-control">
+                        <option value="">Selecionar</option>
+                        @foreach (var item in _smtps)
+                            {
+                            <option value="@item.Key">@item.Value</option>
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="()=>_model.SMTPId" />
+                </div>
             </div>
-            <div class="form-group col-lg-4">
-                <LabelFor For="() => _model.TownHallType" />
-                <InputSelect @bind-Value="_model.TownHallType" class="form-control">
-                    <option value="">Selecionar</option>
-                    @foreach (var item in _townHallNames.Value)
-                        {
-                        <option value="@item.Key">@item.Value</option>
-                        }
-                </InputSelect>
-                <ValidationMessage For="()=>_model.TownHallType" />
+            <div class="col-xs-12 col-lg-4">
+                <div class="form-group">
+                    <LabelFor For="() => _model.TownHallType" />
+                    <InputSelect @bind-Value="_model.TownHallType" class="form-control">
+                        <option value="">Selecionar</option>
+                        @foreach (var item in _townHallNames.Value)
+                            {
+                            <option value="@item.Key">@item.Value</option>
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="()=>_model.TownHallType" />
+                </div>
             </div>
-            <div class="form-group col-lg-5">
-                <LabelFor For="()=>_model.Data" />
-                <InputText @bind-Value="_model.Data" class="form-control" />
-                <ValidationMessage For="()=>_model.Data" />
-                <ValidationMessage For="()=>_model.Data" />
+            <div class="col-xs-12 col-lg-12">
+                <div class="form-group">
+                    <LabelFor For="()=>_model.Data" />
+                    <InputTextArea rows="10" @bind-Value="_model.Data" class="form-control" style="font-family:monospace" />
+                    <ValidationMessage For="()=>_model.Data" />
+                </div>
             </div>
         </div>
         @if (_model.Id == 0)
@@ -70,6 +79,8 @@ else
 
 @code {
     private EditProviderModel _model = new();
+    private EditContext _editContext;
+    private ValidationMessageStore _messageStore;
     private Provider _editing;
     private bool _processing;
     private IDictionary<int, string> _documents;
@@ -85,13 +96,21 @@ else
         _townHalls.Value
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetCustomAttribute<DisplayAttribute>()?.Name ?? kvp.Value.Name));
 
-
-
     [Parameter]
     public EventCallback<ProviderModel> OnUpdate { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += (_, e) =>
+        {
+            _messageStore.Clear(() => _model.Data);
+            ReparseData();
+            _editContext.NotifyValidationStateChanged();
+        };
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += (_, _) => _messageStore.Clear(()=>_model.Data);
+
         _smtps = await _context.SMTPs
             .Active()
             .ToDictionaryAsync(d => d.Id, d => d.Account);
@@ -113,8 +132,35 @@ else
             .Include(d => d.Issuer)
             .SingleAsync();
         _model = _mapper.Map<EditProviderModel>(_editing);
+        ReparseData();
         _processing = false;
         StateHasChanged();
+    }
+
+    private void ReparseData()
+    {
+        if (_townHalls.Value.TryGetValue(_model.TownHallType ?? "", out var thType))
+        {
+            var th = _apiClients.SingleOrDefault(c => c.GetType() == thType);
+            if (th is not null)
+            {
+                try
+                {
+                    var deserialized = string.IsNullOrWhiteSpace(_model.Data)
+                        ? th.DefaultModelData
+                        : JsonSerializer.Deserialize(_model.Data, th.ModelType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    _model.Data = JsonSerializer.Serialize(deserialized, th.ModelType, new JsonSerializerOptions { WriteIndented = true });
+                }
+                catch (Exception e)
+                {
+                    _messageStore.Add(() => _model.Data, $"Erro ao interpretar os dados: {e.Message}");
+                }
+            }
+            else
+                _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura especificada não existe");
+        }
+        else
+            _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura ainda não definida");
     }
 
     private async Task SaveAsync()

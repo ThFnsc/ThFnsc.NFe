@@ -10,7 +10,6 @@ namespace ThFnsc.NFe.Configuration
     {
         public static IServiceCollection AddDependencyInjectionConfigs(this IServiceCollection services)
         {
-            services.AddSingleton<ITownHallApiClient, IPMNFApiClient>();
             services.AddScoped<NFeAppService>();
             services.AddScoped<SMTPAppService>();
             services.AddScoped<ScheduledGenerationAppService>();
