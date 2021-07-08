@@ -1,0 +1,39 @@
+﻿@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+@using System.Linq.Expressions;
+
+@if (Label)
+{
+    <label @attributes="AdditionalAttributes">@_label</label>
+}
+else if (AdditionalAttributes?.Any()??false)
+{
+    <span @attributes="AdditionalAttributes">@_label</span>
+}
+else
+{
+    @_label
+}
+
+@code {
+    private string _label;
+
+    [Parameter]
+    public Expression<Func<object>> For { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> AdditionalAttributes { get; set; }
+
+    [Parameter]
+    public bool Label { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Expression ex = For.Body;
+        if (ex is UnaryExpression ue)
+            ex = ue.Operand;
+        var expression = ex as MemberExpression;
+        var value = expression.Member.GetCustomAttribute<DisplayAttribute>();
+        _label = value?.Name ?? expression.Member.Name ?? "";
+    }
+}

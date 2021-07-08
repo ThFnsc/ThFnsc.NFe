@@ -1,0 +1,10 @@
+﻿@page "/"
+@attribute [PageDisplay(Name = "Notas", OpenIcon = "document", Order = -100)]
+
+<IssueNF OnNFIssued="n=>_list.AddNFe(n)"/>
+<hr />
+<NFList @ref="_list"/>
+
+@code {
+    private NFList _list;
+}

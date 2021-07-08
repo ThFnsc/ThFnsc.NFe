@@ -1,0 +1,198 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject ScheduledGenerationAppService _sgApp
+
+@using ThFnsc.NFe.Models.ScheduledGeneration
+
+@if (_model is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <DataAnnotationsValidator />
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.CronPattern" />
+            <InputText @bind-Value="_model.CronPattern" placeholder="0 10 1 * *" class="form-control" />
+            <ValidationMessage For="()=>_model.CronPattern" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.MailList" />
+            <InputText @bind-Value="_model.MailList" placeholder="Apenas para mim" class="form-control" />
+            <ValidationMessage For="()=>_model.MailList" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.MailTemplateId" />
+            <InputSelect @bind-Value="_model.MailTemplateId" class="form-control">
+                <option value="">Não enviar e-mail</option>
+                @foreach (var doc in _templates)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.MailTemplateId" />
+        </div>
+
+        <div class="col-lg-6">
+            <LabelFor For="() => _model.ProviderId" />
+            <InputSelect @bind-Value="_model.ProviderId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var doc in _providers)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.ProviderId" />
+        </div>
+
+        <div class="col-lg-6">
+            <LabelFor For="() => _model.ToDocumentId" />
+            <InputSelect @bind-Value="_model.ToDocumentId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var doc in _documents)
+                    {
+                    <option value="@doc.Key">@doc.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.ToDocumentId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Value" />
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">R$</span>
+                </div>
+                <InputNumber @bind-Value="_model.Value" class="form-control" />
+            </div>
+            <ValidationMessage For="()=>_model.Value" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.ServiceId" />
+            <InputNumber @bind-Value="_model.ServiceId" class="form-control" />
+            <ValidationMessage For="()=>_model.ServiceId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.AliquotPercentage" />
+            <div class="input-group">
+                <InputNumber @bind-Value="_model.AliquotPercentage" class="form-control" />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon1">%</span>
+                </div>
+            </div>
+            <ValidationMessage For="()=>_model.AliquotPercentage" />
+        </div>
+
+        <div class="col-12">
+            <LabelFor For="() => _model.ServiceDescription" />
+            <InputText @bind-Value="_model.ServiceDescription" class="form-control" />
+            <ValidationMessage For="()=>_model.ServiceDescription" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                <UpdateSchedulesButton />
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private EditScheduledGenerationModel _model;
+    private ScheduledGeneration _editing;
+    private bool _processing;
+    private IDictionary<int, string> _providers;
+    private IDictionary<int, string> _documents;
+    private IDictionary<int, string> _templates;
+
+    [Parameter]
+    public EventCallback<ScheduledGenerationModel> OnUpdate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _documents = await _context.Documents
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Name);
+
+        _providers = await _context.Providers
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Issuer.Name);
+
+        _templates = await _context.MailTemplates
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Name);
+
+        _model = await _context.NFes
+            .Active()
+            .OrderBy(n => n.Id)
+            .ProjectTo<EditScheduledGenerationModel>(_mapper.ConfigurationProvider)
+            .LastOrDefaultAsync();
+
+        if (_model is null)
+            _model = new();
+        else
+            _model.Id = 0;
+    }
+
+    public async Task EditAsync(int id)
+    {
+        _processing = true;
+        _model = null;
+        StateHasChanged();
+        _editing = await _context.ScheduledGenerations
+            .Active()
+            .OfId(id)
+            .SingleAsync();
+        _model = _mapper.Map<EditScheduledGenerationModel>(_editing);
+        _processing = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        _processing = true;
+        if (_model.Id == 0)
+            await _sgApp.CreateAsync(
+                _model.CronPattern,
+                _model.ProviderId.Value,
+                _model.MailList,
+                _model.MailTemplateId,
+                _model.ToDocumentId.Value,
+                _model.Value,
+                _model.AliquotPercentage,
+                _model.ServiceId,
+                _model.ServiceDescription,
+                true);
+        else
+            await _sgApp.UpdateAsync(
+                _model.Id,
+                _model.CronPattern,
+                _model.ProviderId.Value,
+                _model.MailList,
+                _model.MailTemplateId,
+                _model.ToDocumentId.Value,
+                _model.Value,
+                _model.AliquotPercentage,
+                _model.ServiceId,
+                _model.ServiceDescription,
+                true);
+
+        _model = new();
+        await OnUpdate.InvokeAsync();
+        _processing = false;
+    }
+}

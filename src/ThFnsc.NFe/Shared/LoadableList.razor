@@ -1,0 +1,62 @@
+﻿@typeparam TItem
+
+@if (Items is null)
+{
+    if (Null is null)
+    {
+        <Loader />
+    }
+    else
+    {
+        @Null
+    }
+}
+else if (!Items.Any())
+{
+    if (Empty is null)
+    {
+        <div class="alert alert-info">Nada a ser mostrado</div>
+    }
+    else
+    {
+        @Empty
+    }
+}
+else
+{
+    if (Each is not null)
+    {
+        foreach (var item in Items)
+        {
+            @Each(item)
+        }
+    }
+    else if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @Any(Items)
+    }
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    public RenderFragment Null { get; set; }
+
+    [Parameter]
+    public RenderFragment Empty { get; set; }
+
+    [Parameter]
+    public RenderFragment<IEnumerable<TItem>> Any { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> Each { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ThFnsc.NFe.Data.Context;
 
 namespace ThFnsc.NFe.Configuration
@@ -11,6 +12,11 @@ namespace ThFnsc.NFe.Configuration
         {
             services.AddDbContext<NFContext>(opt =>
                 opt.UseMySQL(configuration.GetConnectionString("Default")));
+
+            using var sp = services.BuildServiceProvider();
+            sp.GetRequiredService<ILogger<NFContext>>().LogInformation("Applying migrations to database...");
+            sp.GetRequiredService<NFContext>().Database.Migrate();
+
             return services;
         }
     }

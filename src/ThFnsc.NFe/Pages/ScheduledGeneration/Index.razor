@@ -1,0 +1,11 @@
+﻿@page "/ScheduledGenerations"
+@attribute [PageDisplay(Name = "Agendamentos", OpenIcon = "calendar")]
+
+<EditScheduledGeneration @ref="_edit" OnUpdate="()=>_list.UpdateAsync()" />
+<hr />
+<ScheduledGenerationList OnEdit="id=>_edit.EditAsync(id)" @ref="_list" />
+
+@code {
+    private EditScheduledGeneration _edit;
+    private ScheduledGenerationList _list;
+}

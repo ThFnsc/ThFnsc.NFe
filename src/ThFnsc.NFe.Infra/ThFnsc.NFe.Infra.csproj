@@ -1,26 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="C:\Users\Thiag\.nuget\packages\select.htmltopdf.netcore\21.1.0\contentFiles\any\any\Select.Html.dep" />
-    <Content Remove="C:\Users\Thiag\.nuget\packages\select.htmltopdf\21.1.0\contentFiles\any\any\Select.Html.dep" />
-  </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.3.2" />
+    <PackageReference Include="FluentEmail.Smtp" Version="3.0.0" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.24" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
-    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="21.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PDF\" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ThFnsc.NFe.Core\ThFnsc.NFe.Core.csproj" />
     <ProjectReference Include="..\ThFnsc.NFe.Data\ThFnsc.NFe.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="node\*.js*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

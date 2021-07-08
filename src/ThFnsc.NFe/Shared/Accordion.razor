@@ -1,0 +1,22 @@
+﻿<div class="accordion-item">
+    <h2 class="accordion-header" id="@_id-h">
+        <button class="accordion-button collapsed bg-dark bg-gradient text-white" type="button" data-bs-toggle="collapse" data-bs-target="#@_id-c" aria-expanded="false" aria-controls="flush-collapseOne">
+            @Heading
+        </button>
+    </h2>
+    <div id="@_id-c" class="accordion-collapse collapse bg-dark" aria-labelledby="@_id-h" style="">
+        <div class="accordion-body">
+            @Content
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _id = "accr-" + Guid.NewGuid().ToString();
+
+    [Parameter]
+    public RenderFragment Heading { get; set; }
+
+    [Parameter]
+    public RenderFragment Content { get; set; }
+}

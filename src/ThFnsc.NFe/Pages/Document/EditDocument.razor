@@ -1,0 +1,139 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject SMTPAppService _smtp
+@using ThFnsc.NFe.Models.Document
+
+@if (_model is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.DocType" />
+            <InputSelect @bind-Value="_model.DocType" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var docType in EditDocumentModel.SupportedDocuments)
+                    {
+                    <option value="@docType">@docType</option>
+                    }
+            </InputSelect>
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.DocIdentifier" />
+            <InputText @bind-Value="_model.DocIdentifier" class="form-control" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Name" />
+            <InputText @bind-Value="_model.Name" class="form-control" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.Email" />
+            <InputText @bind-Value="_model.Email" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.Street" />
+            <InputText @bind-Value="_model.Address.Street" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.StreetNumber" />
+            <InputText @bind-Value="_model.Address.StreetNumber" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.Complement" />
+            <InputText @bind-Value="_model.Address.Complement" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.Neighborhood" />
+            <InputText @bind-Value="_model.Address.Neighborhood" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.City" />
+            <InputText @bind-Value="_model.Address.City" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.CityId" />
+            <InputNumber @bind-Value="_model.Address.CityId" class="form-control" />
+        </div>
+
+        <div class="col-lg-1">
+            <LabelFor For="() => _model.Address.State" />
+            <InputText @bind-Value="_model.Address.State" class="form-control" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="() => _model.Address.PostalCode" />
+            <InputText @bind-Value="_model.Address.PostalCode" class="form-control" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private EditDocumentModel _model = new();
+    private Document _editing;
+    private bool _processing;
+
+    [Parameter]
+    public EventCallback<Document> OnUpdate { get; set; }
+
+    public async Task EditAsync(int id)
+    {
+        _processing = true;
+        _model = null;
+        StateHasChanged();
+        _editing = await _context.Documents
+            .Active()
+            .OfId(id)
+            .Include(d => d.Address)
+            .SingleAsync();
+        _model = _mapper.Map<EditDocumentModel>(_editing);
+        _processing = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model.Id == 0)
+        {
+            _processing = true;
+            var address = new Address(_model.Address.Street, _model.Address.StreetNumber, _model.Address.City, _model.Address.CityId, _model.Address.Complement, _model.Address.Neighborhood, _model.Address.State, _model.Address.PostalCode);
+            var document = new Document(_model.DocType, _model.DocIdentifier, _model.Name, _model.Email, address);
+            _context.Add(address);
+            _context.Add(document);
+            await _context.SaveChangesAsync();
+            _model = new();
+            await OnUpdate.InvokeAsync();
+            _processing = false;
+        }
+        else
+        {
+            _editing.Delete();
+            _model.Id = 0;
+            await SaveAsync();
+        }
+    }
+}

@@ -1,0 +1,189 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject SMTPAppService _smtp
+@inject IEnumerable<ITownHallApiClient> _apiClients
+@using ThFnsc.NFe.Models.Provider
+@using System.Reflection
+@using ThFnsc.NFe.Core.Services
+@using System.Text.Json
+
+@if (_model is null || _documents is null || _smtps is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm EditContext="_editContext" OnValidSubmit="SaveAsync" class="row g-3">
+        <DataAnnotationsValidator />
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.DocumentId" />
+            <InputSelect @bind-Value="_model.DocumentId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var item in _documents)
+                    {
+                    <option value="@item.Key">@item.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.DocumentId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.SMTPId" />
+            <InputSelect @bind-Value="_model.SMTPId" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var item in _smtps)
+                    {
+                    <option value="@item.Key">@item.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.SMTPId" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="() => _model.TownHallType" />
+            <InputSelect @bind-Value="_model.TownHallType" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var item in _townHallNames.Value)
+                    {
+                    <option value="@item.Key">@item.Value</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.TownHallType" />
+        </div>
+
+        <div class="col-lg-12">
+            <Accordion>
+                <Heading>
+                    <Name For="()=>_model.Data" />
+                </Heading>
+                <Content>
+                    <InputTextArea rows="10" @bind-Value="_model.Data" class="form-control" style="font-family:monospace" />
+                </Content>
+            </Accordion>
+            <ValidationMessage For="()=>_model.Data" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private EditProviderModel _model = new();
+    private EditContext _editContext;
+    private ValidationMessageStore _messageStore;
+    private Provider _editing;
+    private bool _processing;
+    private IDictionary<int, string> _documents;
+    private IDictionary<int, string> _smtps;
+
+    private static Lazy<IDictionary<string, Type>> _townHalls = new(() =>
+          AppDomain.CurrentDomain.GetAssemblies()
+              .Where(a => a.GetName().Name.StartsWith(nameof(ThFnsc)))
+              .SelectMany(a => a.GetTypes())
+              .Where(t => t.GetInterfaces().Contains(typeof(ITownHallApiClient)))
+              .ToDictionary(t => t.FullName, t => t));
+    private static Lazy<IDictionary<string, string>> _townHallNames = new(() =>
+        _townHalls.Value
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetCustomAttribute<DisplayAttribute>()?.Name ?? kvp.Value.Name));
+
+    [Parameter]
+    public EventCallback<ProviderModel> OnUpdate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += (_, e) =>
+        {
+            _messageStore.Clear(() => _model.Data);
+            ReparseData();
+            _editContext.NotifyValidationStateChanged();
+        };
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += (_, _) => _messageStore.Clear(() => _model.Data);
+
+        _smtps = await _context.SMTPs
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => d.Account);
+
+        _documents = await _context.Documents
+            .Active()
+            .ToDictionaryAsync(d => d.Id, d => $"{d.DocIdentifier} {d.Name}");
+    }
+
+    public async Task EditAsync(int id)
+    {
+        _processing = true;
+        _model = null;
+        StateHasChanged();
+        _editing = await _context.Providers
+            .Active()
+            .OfId(id)
+            .Include(d => d.SMTP)
+            .Include(d => d.Issuer)
+            .SingleAsync();
+        _model = _mapper.Map<EditProviderModel>(_editing);
+        ReparseData();
+        _processing = false;
+        StateHasChanged();
+    }
+
+    private void ReparseData()
+    {
+        if (_townHalls.Value.TryGetValue(_model.TownHallType ?? "", out var thType))
+        {
+            var th = _apiClients.SingleOrDefault(c => c.GetType() == thType);
+            if (th is not null)
+            {
+                try
+                {
+                    var deserialized = string.IsNullOrWhiteSpace(_model.Data)
+                        ? th.DefaultModelData
+                        : JsonSerializer.Deserialize(_model.Data, th.ModelType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    _model.Data = JsonSerializer.Serialize(deserialized, th.ModelType, new JsonSerializerOptions { WriteIndented = true });
+                }
+                catch (Exception e)
+                {
+                    _messageStore.Add(() => _model.Data, $"Erro ao interpretar os dados: {e.Message}");
+                }
+            }
+            else
+                _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura especificada não existe");
+        }
+        else
+            _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura ainda não definida");
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model.Id == 0)
+        {
+            _processing = true;
+            var issuer = await _context.Documents.Active().OfId(_model.DocumentId.Value).SingleAsync();
+            var smtp = await _context.SMTPs.Active().OfId(_model.SMTPId.Value).SingleAsync();
+            var provider = new Provider(issuer, smtp, _model.Data, _model.TownHallType);
+            _context.Add(provider);
+            await _context.SaveChangesAsync();
+            _model = new();
+            await OnUpdate.InvokeAsync();
+            _processing = false;
+        }
+        else
+        {
+            _editing.Delete();
+            _model.Id = 0;
+            await SaveAsync();
+        }
+    }
+}

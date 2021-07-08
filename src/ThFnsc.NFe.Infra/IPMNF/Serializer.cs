@@ -85,9 +85,14 @@ namespace ThFnsc.NFe.Infra.IPMNF
                 }
             };
 
-            var serializer = new XmlSerializer(typeof(NFSE));
+            return SerializeXML(nfse);
+        }
+
+        public static string SerializeXML<T>(T obj)
+        {
+            var serializer = new XmlSerializer(typeof(T));
             using var st = new CustomStringWriter();
-            serializer.Serialize(st, nfse);
+            serializer.Serialize(st, obj);
             return st.ToString();
         }
     }

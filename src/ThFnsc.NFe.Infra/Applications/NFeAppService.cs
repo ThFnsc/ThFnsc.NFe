@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;
@@ -15,20 +16,58 @@ namespace ThFnsc.NFe.Infra.Applications
     {
         private readonly IEnumerable<ITownHallApiClient> _clients;
         private readonly NFContext _context;
+        private readonly SMTPAppService _smtp;
+        private readonly IRazorRenderer _razorRenderer;
 
-        public NFeAppService(IEnumerable<ITownHallApiClient> clients, NFContext context)
+        public NFeAppService(
+            IEnumerable<ITownHallApiClient> clients,
+            NFContext context,
+            SMTPAppService smtp,
+            IRazorRenderer razorRenderer)
         {
             _clients = clients;
             _context = context;
+            _smtp = smtp;
+            _razorRenderer = razorRenderer;
         }
 
-        public async Task<(Stream, IssuedNFe)> PDFForIdAsync(int id)
+        public async Task<IssuedNFe> DeleteAsync(int id)
         {
             var nf = await _context.NFes
+                .Active()
                 .OfId(id)
                 .SingleAsync();
+            nf.Delete();
+            await _context.SaveChangesAsync();
+            return nf;
+        }
 
-            return (HtmlToPDF.ConvertHTMLToPDF(nf.ReturnedContent), nf);
+        public async Task MailToAsync(int nfId, int templateId, IEnumerable<string> additionalAddresses)
+        {
+            var template = await _context.MailTemplates
+                .Active()
+                .OfId(templateId)
+                .SingleAsync();
+
+            var nf = await _context.NFes
+                .OfId(nfId)
+                .Include(n => n.Provider.SMTP)
+                .Include(n => n.Provider.Issuer.Address)
+                .Include(n => n.DocumentTo.Address)
+                .SingleAsync();
+
+            using var msXml = new MemoryStream(Encoding.UTF8.GetBytes(nf.ReturnedXMLContent));
+            using var msPdf = new MemoryStream(nf.ReturnedPDF);
+
+            await _smtp.SendMailAsync(nf.Provider.SMTP.Id, async msg => msg
+                .To(new[] { nf.Provider.SMTP.Account }
+                    .Concat(additionalAddresses ?? Array.Empty<string>())
+                    .Distinct()
+                    .Select(m => new FluentEmail.Core.Models.Address(m, null)))
+                .Subject(await _razorRenderer.RenderAsync($"mt-{template.Id}-s", template.Subject, nf))
+                .Body(await _razorRenderer.RenderAsync($"mt-{template.Id}-b", template.Body, nf), true)
+                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.xml", ContentType = "application/xml", Data = msXml })
+                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.pdf", ContentType = "application/pdf", Data = msPdf }));
         }
 
         public async Task<IssuedNFe> IssueNFeAsync(
@@ -61,35 +100,24 @@ namespace ThFnsc.NFe.Infra.Applications
                 aliquotPercentage: aliquotPercentage,
                 documentTo: toDocument);
 
-            var xml = await client.GenerateXMLAsync(nf);
             _context.Add(nf);
+
             await _context.SaveChangesAsync();
+
             try
             {
-                var res = await client.GenerateFromXMLAsync(nf, xml);
-                if (res.Success)
-                    nf.OnSuccess(
-                        returnedContent: res.RawResponse,
-                        series: res.Series,
-                        verificationCode: res.VerificationCode,
-                        issuedAt: DateTimeOffset.UtcNow, sentContent: xml);
-                else
-                    nf.OnError(
-                        returnedContent: res.RawResponse,
-                        errorMessage: "Could not parse response", sentContent: xml);
-                return nf;
+                var res = await client.GenerateAsync(nf);
+                nf.OnReturned(res.Success, res.Error?.Message, res.SentXML, res.RawResponse, res.ReturnedXML, res.ReturnedPDF, res.Series, res.VerificationCode, DateTimeOffset.UtcNow);
             }
             catch (Exception e)
             {
-                nf.OnError(
-                    returnedContent: null,
-                    errorMessage: e.Message, sentContent: xml);
-                throw;
+                nf.OnReturned(false, e.Message, null, null, null, null, 0, null, DateTimeOffset.UtcNow);
             }
             finally
             {
                 await _context.SaveChangesAsync();
             }
+            return nf;
         }
     }
 }

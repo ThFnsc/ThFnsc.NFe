@@ -11,6 +11,7 @@ namespace ThFnsc.NFe.Configuration
             services.AddServerSideBlazor();
             if (environment.IsDevelopment())
                 mvcBuilder.AddRazorRuntimeCompilation();
+            services.AddAutoMapper(typeof(MappingProfile));
             return services;
         }
     }

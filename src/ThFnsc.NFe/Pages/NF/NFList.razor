@@ -1,6 +1,11 @@
-﻿@using ThFnsc.NFe.Data.Entities
-@inject ThFnsc.NFe.Data.Context.NFContext _context
+﻿@using ThFnsc.NFe.Models.NFe
+@inject NFContext _context
 @inject NavigationManager _navManager
+@inject IMapper _mapper
+@inject NFeAppService _nfe
+@inject IJSRuntime _js
+
+<Alert @ref="_alert"/>
 
 @if (_nfes == null)
 {
@@ -12,74 +17,116 @@ else if (!_nfes.Any())
 }
 else
 {
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <td>Data</td>
-                <td>Série</td>
-                <td>Valor</td>
-                <td>Cód. Verif.</td>
-                <td>De</td>
-                <td>Para</td>
-                <td>Ações</td>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var nf in _nfes)
-            {
-                var statusColor = nf.Success.HasValue
-                    ? nf.Success.Value
-                        ? "success"
-                        : "danger"
-                    : "warning";
-                <tr class="table-@statusColor">
-                    <td>@nf.CreatedAt</td>
-                    <td>@nf.Series</td>
-                    <td>R$@nf.Value.ToString("0.00")</td>
-                    <td>@nf.VerificationCode</td>
-                    <td>@nf.Provider.Issuer.Name</td>
-                    <td>@nf.DocumentTo.Name</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-primary btn-sm" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
-                                <span class="oi oi-cloud-download"></span>
-                            </button>
-                            @if (nf.Success is null || !nf.Success.Value)
-                            {
-                                <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
-                                    <span class="oi oi-trash"></span>
-                                </button>
-                            }
-                        </div>
-                    </td>
-                </tr>
+    <TList Items="_nfes">
+        <TableHeader>
+            <td>Data</td>
+            <td>Série</td>
+            <td>Valor</td>
+            <td>Cód. Verif.</td>
+            <td>De</td>
+            <td>Para</td>
+            <td>Ações</td>
+        </TableHeader>
+        <Each Context="nf">
+            @{var statusColor = nf.Success.HasValue
+                ? nf.Success.Value
+                    ? "success"
+                    : "danger"
+                : "warning";
             }
-        </tbody>
-    </table>
+            <tr class="text-@statusColor">
+                <td>@nf.IssuedAt</td>
+                <td>@nf.Series</td>
+                <td>R$@nf.Value.ToString("0.00")</td>
+                <td>@nf.VerificationCode</td>
+                <td>@nf.Provider.Issuer.Name</td>
+                <td>@nf.DocumentTo.Name</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-sm" title="Baixar PDF" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
+                            <span class="oi oi-document"></span>
+                        </button>
+                        <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
+                            <span class="oi oi-code"></span>
+                        </button>
+                        <button class="btn btn-success btn-sm" title="Enviar por e-mail" @onclick='() => MailAsync(nf)'>
+                            <span class="oi oi-envelope-closed"></span>
+                        </button>
+                        @if (nf.Success is null || !nf.Success.Value)
+                            {
+                            <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
+                                <span class="oi oi-trash"></span>
+                            </button>
+                            }
+                    </div>
+                </td>
+            </tr>
+        </Each>
+    </TList>
 }
 
 @code {
-    private List<IssuedNFe> _nfes;
+    private List<NFModel> _nfes;
+    private Alert _alert;
 
     public void AddNFe(IssuedNFe nfe) =>
-        _nfes.Insert(0, nfe);
+        _nfes.Insert(0, _mapper.Map<NFModel>(nfe));
 
-    protected override async Task OnInitializedAsync() 
+    protected override async Task OnInitializedAsync()
     {
         _nfes = await _context.NFes
             .Active()
-            .Include(n => n.Provider)
-                .ThenInclude(p => p.Issuer)
-            .Include(n => n.DocumentTo)
             .OrderByDescending(n=>n.Success)
                 .ThenByDescending(n=>n.Series)
+            .ProjectTo<NFModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
 
-    private async Task DeleteAsync(IssuedNFe nfe)
+    private async Task DeleteAsync(NFModel nfe)
     {
-        nfe.Delete();
-        await _context.SaveChangesAsync();
+
+        await _nfe.DeleteAsync(nfe.Id);
         _nfes.Remove(nfe);
+    }
+
+    private async Task MailAsync(NFModel nfe)
+    {
+        var schedule = await _context.ScheduledGenerations
+            .Active()
+            .Where(s => s.Provider.Id == nfe.Provider.Id)
+            .Select(a => new
+            {
+                a.MailList,
+                TemplateId = a.MailTemplate.Id
+            })
+            .FirstOrDefaultAsync();
+
+        var addresses = await _js.InvokeAsync<string>("prompt", "Se quiser enviar essa nota para mais endereços de e-mail, escreva-os separados por vírgula", schedule?.MailList ?? string.Empty);
+
+        var templates = await _context.MailTemplates
+            .Active()
+            .ToDictionaryAsync(t => t.Id, t => t.Name);
+
+        string templateId = await _js.InvokeAsync<string>("prompt", $"Selecione o template que deseja usar:\n{string.Join('\n', templates.Select(t => $"  {t.Key} => {t.Value}"))}", schedule?.TemplateId ?? templates.FirstOrDefault().Key);
+
+        if (!int.TryParse(templateId, out var templateIdInt) || !templates.ContainsKey(templateIdInt))
+        {
+            await _js.InvokeVoidAsync("alert", "Id inválido. Cancelado");
+            return;
+        }
+
+        var addressesList = new[] { nfe.Provider.SMTP.Account }.Concat(addresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        if (!await _js.InvokeAsync<bool>("confirm", $"Enviar e-mail da nota de série {nfe.Series} para os usuários {string.Join(", ", addressesList)} usando o template '{templates[templateIdInt]}'. É isso mesmo?"))
+            return;
+
+        try
+        {
+            await _nfe.MailToAsync(nfe.Id, templateIdInt, addressesList);
+            _alert.Show(Alert.AlertTypes.Success, "Mensagens enviadas com sucesso!", null, TimeSpan.FromSeconds(5));
+        } catch (Exception e)
+        {
+            _alert.Show(Alert.AlertTypes.Danger, e.Message, "Não foi possível enviar", TimeSpan.FromSeconds(15));
+        }
     }
 }

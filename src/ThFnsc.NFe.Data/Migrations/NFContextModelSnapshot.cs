@@ -15,7 +15,7 @@ namespace ThFnsc.NFe.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.6");
+                .HasAnnotation("ProductVersion", "5.0.7");
 
             modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Address", b =>
                 {
@@ -137,6 +137,12 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Property<string>("ReturnedContent")
                         .HasColumnType("text");
 
+                    b.Property<byte[]>("ReturnedPDF")
+                        .HasColumnType("MEDIUMBLOB");
+
+                    b.Property<string>("ReturnedXMLContent")
+                        .HasColumnType("text");
+
                     b.Property<string>("SentContent")
                         .HasColumnType("text");
 
@@ -177,6 +183,38 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.HasIndex("VerificationCode");
 
                     b.ToTable("NFes");
+                });
+
+            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.MailTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Body")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(767)");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DeletedAt");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("MailTemplates");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Provider", b =>
@@ -240,8 +278,8 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
-                    b.Property<ushort>("Port")
-                        .HasColumnType("smallint unsigned");
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
 
                     b.Property<bool>("UseEncryption")
                         .HasColumnType("tinyint(1)");
@@ -256,6 +294,65 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.HasIndex("DeletedAt");
 
                     b.ToTable("SMTPs");
+                });
+
+            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.ScheduledGeneration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<float>("AliquotPercentage")
+                        .HasColumnType("float");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp");
+
+                    b.Property<string>("CronPattern")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MailList")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("MailTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProviderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceDescription")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ToDocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DeletedAt");
+
+                    b.HasIndex("Enabled");
+
+                    b.HasIndex("MailTemplateId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.HasIndex("ToDocumentId");
+
+                    b.ToTable("ScheduledGenerations");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Document", b =>
@@ -295,6 +392,27 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Navigation("Issuer");
 
                     b.Navigation("SMTP");
+                });
+
+            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.ScheduledGeneration", b =>
+                {
+                    b.HasOne("ThFnsc.NFe.Data.Entities.MailTemplate", "MailTemplate")
+                        .WithMany()
+                        .HasForeignKey("MailTemplateId");
+
+                    b.HasOne("ThFnsc.NFe.Data.Entities.Provider", "Provider")
+                        .WithMany()
+                        .HasForeignKey("ProviderId");
+
+                    b.HasOne("ThFnsc.NFe.Data.Entities.Document", "ToDocument")
+                        .WithMany()
+                        .HasForeignKey("ToDocumentId");
+
+                    b.Navigation("MailTemplate");
+
+                    b.Navigation("Provider");
+
+                    b.Navigation("ToDocument");
                 });
 #pragma warning restore 612, 618
         }

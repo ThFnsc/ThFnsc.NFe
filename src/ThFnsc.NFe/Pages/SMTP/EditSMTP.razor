@@ -1,0 +1,143 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject SMTPAppService _smtp
+@using ThFnsc.NFe.Models.SMTP
+
+<Alert @ref="_alert" />
+
+@if (_model is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <DataAnnotationsValidator />
+        <div class="col-lg-5">
+            <LabelFor For="()=>_model.AccountName" />
+            <InputText @bind-Value="_model.AccountName" class="form-control" />
+            <ValidationMessage For="()=>_model.AccountName" />
+        </div>
+
+        <div class="col-lg-5">
+            <LabelFor For="()=>_model.Host" />
+            <InputText @bind-Value="_model.Host" class="form-control" />
+            <ValidationMessage For="()=>_model.Host" />
+        </div>
+
+        <div class="col-lg-2">
+            <LabelFor For="()=>_model.Port" />
+            <div class="input-group">
+                <InputNumber @bind-Value="_model.Port" class="form-control" />
+                <div class="input-group-text">
+                    <div class="form-check form-switch m-0">
+                        <InputCheckbox @bind-Value="_model.UseEncryption" id="@nameof(_model.UseEncryption)" class="form-check-input" />
+                        <label class="form-check-label" for="@nameof(_model.UseEncryption)">SSL/TLS</label>
+                    </div>
+                </div>
+            </div>
+            <ValidationMessage For="()=>_model.Port" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="()=>_model.Account" />
+            <InputText @bind-Value="_model.Account" class="form-control" />
+            <ValidationMessage For="()=>_model.Account" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="()=>_model.Username" />
+            <InputText @bind-Value="_model.Username" class="form-control" />
+            <ValidationMessage For="()=>_model.Username" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor type="password" For="()=>_model.Password" />
+            <InputText @bind-Value="_model.Password" type="password" placeholder="@(_model.Id == 0 ? "" : "Não alterar")" class="form-control" />
+            <ValidationMessage For="()=>_model.Password" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private SMTP _editing;
+    private EditSMTPModel _model = new();
+    private bool _processing;
+    private Alert _alert;
+
+    public async Task EditAsync(int id)
+    {
+        _processing = true;
+        _model = null;
+        StateHasChanged();
+        _editing = await _context.SMTPs
+            .Active()
+            .OfId(id)
+            .SingleAsync();
+        _model = _mapper.Map<EditSMTPModel>(_editing);
+        _model.Password = null;
+        _processing = false;
+        StateHasChanged();
+    }
+
+    [Parameter]
+    public EventCallback OnUpdate { get; set; }
+
+    private async Task<bool> TestSMTPAsync()
+    {
+        try
+        {
+            await SMTPAppService.TestSMTPAsync(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password ?? _editing.Password, _model.AccountName);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _alert.Show(Alert.AlertTypes.Danger, e.Message, "O teste do SMTP não foi bem sucedido");
+            return false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        _alert.Hide();
+        _processing = true;
+        if (_model.Id == 0)
+        {
+            var smtp = new SMTP(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password, _model.AccountName);
+            if (await TestSMTPAsync())
+            {
+                _context.Add(_smtp);
+                await _context.SaveChangesAsync();
+                _model = new();
+                _alert.Show(Alert.AlertTypes.Success, "Teste de SMTP efetuado com sucesso, modificações salvas!", "Salvo!");
+                await OnUpdate.InvokeAsync();
+            }
+        }
+        else
+        {
+            if (await TestSMTPAsync())
+            {
+                _editing.Update(_model.Host, _model.Port, _model.UseEncryption, _model.Account, _model.Username, _model.Password ?? _editing.Password, _model.AccountName);
+                await _context.SaveChangesAsync();
+                _model = new();
+                await OnUpdate.InvokeAsync();
+            }
+        }
+        _processing = false;
+    }
+}

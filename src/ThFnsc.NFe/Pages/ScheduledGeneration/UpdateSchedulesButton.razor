@@ -1,0 +1,21 @@
+﻿@inject ScheduledGenerationAppService _sgApp
+
+<button type="button" class="btn btn-secondary" @onclick="Update">
+    Atualizar todos no Hangfire
+    <Loader Button="true" Visible="_completed == false" />
+    @if (_completed.HasValue && _completed.Value)
+    {
+        <span class="oi oi-check"></span>
+    }
+</button>
+
+@code {
+    private bool? _completed;
+
+    public async Task Update()
+    {
+        _completed = false;
+        await _sgApp.UpdateAllJobs();
+        _completed = true;
+    }
+}

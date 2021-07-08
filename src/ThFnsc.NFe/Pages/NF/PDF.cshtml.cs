@@ -1,23 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
-using ThFnsc.NFe.Infra.Applications;
+using ThFnsc.NFe.Data.Context;
+using ThFnsc.NFe.Data.Repositories;
 
-namespace ThFnsc.NFe.Pages
+namespace ThFnsc.NFe.Pages.NF
 {
     public class PDFModel : PageModel
     {
-        private readonly NFeAppService _nfe;
+        private readonly NFContext _context;
 
-        public PDFModel(NFeAppService nfe)
+        public PDFModel(NFContext context)
         {
-            _nfe = nfe;
+            _context = context;
         }
 
         public async Task<ActionResult> OnGetAsync(int id)
         {
-            var (stream, nf) = await _nfe.PDFForIdAsync(id);
-            return File(stream, "application/pdf", $"NF-{nf.Series}.pdf");
+            var nf = await _context.NFes
+                .OfId(id)
+                .Select(nf => new
+                {
+                    nf.Series,
+                    PDF = nf.ReturnedPDF
+                })
+                .SingleAsync();
+            return File(nf.PDF, "application/pdf", $"NF-{nf.Series}.pdf");
         }
     }
 }
