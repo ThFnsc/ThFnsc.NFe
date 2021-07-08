@@ -52,8 +52,14 @@ else
         </div>
 
         <div class="col-lg-12">
-            <LabelFor For="()=>_model.Data" />
-            <InputTextArea rows="10" @bind-Value="_model.Data" class="form-control" style="font-family:monospace" />
+            <Accordion>
+                <Heading>
+                    <Name For="()=>_model.Data" />
+                </Heading>
+                <Content>
+                    <InputTextArea rows="10" @bind-Value="_model.Data" class="form-control" style="font-family:monospace" />
+                </Content>
+            </Accordion>
             <ValidationMessage For="()=>_model.Data" />
         </div>
 

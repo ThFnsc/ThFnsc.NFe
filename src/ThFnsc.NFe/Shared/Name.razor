@@ -6,7 +6,7 @@
 {
     <label @attributes="AdditionalAttributes">@_label</label>
 }
-else if (AdditionalAttributes.Any())
+else if (AdditionalAttributes?.Any()??false)
 {
     <span @attributes="AdditionalAttributes">@_label</span>
 }
