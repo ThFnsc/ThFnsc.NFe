@@ -17,6 +17,7 @@ RUN wget https://packages.microsoft.com/config/${DISTRO}/${DISTRO_VERSION}/packa
 	&& rm packages-microsoft-prod.deb
 
 #Chromium
+ARG DEBIAN_FRONTEND=noninteractive
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 
