@@ -1,17 +1,15 @@
 ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=21.04
-ARG NODE_VERSION=14
 ARG DOTNET_VERSION=5.0
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ base stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM $DISTRO:$DISTRO_VERSION AS base
 ARG DISTRO
 ARG DISTRO_VERSION
-ARG NODE_VERSION
 
 #Basic packages
 RUN apt-get update
-RUN apt-get install -y curl wget gnupg ca-certificates procps libxss1 apt-transport-https
+RUN apt-get install -y wget gnupg ca-certificates procps libxss1 apt-transport-https
 
 #Dotnet
 RUN wget https://packages.microsoft.com/config/${DISTRO}/${DISTRO_VERSION}/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
@@ -22,12 +20,9 @@ RUN wget https://packages.microsoft.com/config/${DISTRO}/${DISTRO_VERSION}/packa
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 
-#NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash -
-
-#Install chromium and nodejs
+#Install chromium
 RUN apt-get update
-RUN apt-get install -y google-chrome-stable nodejs
+RUN apt-get install -y google-chrome-stable
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ build stage ~~~~~~~~~~~~~~~~~~~~~~~~#

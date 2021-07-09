@@ -1,5 +1,4 @@
 using Hangfire;
-using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +47,7 @@ namespace ThFnsc.NFe
                 endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapHangfireDashboard("/HF", new DashboardOptions { Authorization = new [] { new AllowAllAuthorizationFilter() } });
+                endpoints.MapHangfireDashboard("/HF", new DashboardOptions { Authorization = new[] { new AllowAllAuthorizationFilter() } });
             });
         }
     }

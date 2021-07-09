@@ -2,6 +2,7 @@
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Infra.Applications;
 using ThFnsc.NFe.Infra.Services;
+using ThFnsc.NFe.Infra.Services.Chrome;
 
 namespace ThFnsc.NFe.Configuration
 {
@@ -13,8 +14,9 @@ namespace ThFnsc.NFe.Configuration
             services.AddScoped<SMTPAppService>();
             services.AddScoped<ScheduledGenerationAppService>();
 
-            services.AddSingleton<IHtmlToPDF, HtmlToPDF>();
+            services.AddSingleton<IHtmlToPDF, PuppeteerSharpHtmlToPDF>();
             services.AddSingleton<IRazorRenderer, RazorRenderer>();
+            services.AddSingleton<IChromePathFinder, DumbChromeFinder>();
             return services;
         }
     }
