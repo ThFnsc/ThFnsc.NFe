@@ -1,5 +1,4 @@
 ﻿using ThFnsc.NFe.Models.Document;
-using ThFnsc.NFe.Models.MailTemplate;
 using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe.Models.ScheduledGeneration
@@ -11,10 +10,6 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
         public string CronPattern { get; set; }
 
         public ProviderModel Provider { get; set; }
-
-        public string MailList { get; set; }
-
-        public MailTemplateModel MailTemplate { get; set; }
 
         public DocumentModel ToDocument { get; set; }
 

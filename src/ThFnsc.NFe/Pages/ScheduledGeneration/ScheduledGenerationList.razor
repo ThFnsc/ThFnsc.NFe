@@ -27,13 +27,6 @@
             <td>@item.ServiceDescription</td>
             <td>@item.ServiceId</td>
             <td>
-                @foreach(var mail in item.MailList.Split(',', StringSplitOptions.TrimEntries))
-                    {
-                        <div>@mail</div>
-                    }
-            </td>
-            <td>@item.MailTemplate.Name</td>
-            <td>
                 <div class="btn btn-group">
                     <button class="btn btn-@(item.Enabled ? "success":"danger") btn-sm" @onclick="()=>ToggleEnableAsync(item)"><span class="oi oi-power-standby"></span></button>
                     <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>

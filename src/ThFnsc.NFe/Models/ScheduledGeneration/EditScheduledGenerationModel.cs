@@ -15,12 +15,6 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
         [Required]
         public int? ProviderId { get; set; }
 
-        [Display(Name = "Enviar para")]
-        public string MailList { get; set; }
-
-        [Display(Name = "Template do e-mail")]
-        public int? MailTemplateId { get; set; }
-
         [Display(Name = "Para o documento")]
         [Required]
         public int? ToDocumentId { get; set; }

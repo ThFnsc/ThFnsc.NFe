@@ -49,9 +49,9 @@ else
                         <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
                             <span class="oi oi-code"></span>
                         </button>
-                        <button class="btn btn-success btn-sm" title="Enviar por e-mail" @onclick='() => MailAsync(nf)'>
-                            <span class="oi oi-envelope-closed"></span>
-                        </button>
+                        @*<button class="btn btn-success btn-sm" title="Enviar por e-mail" @onclick='() => MailAsync(nf)'>
+            <span class="oi oi-envelope-closed"></span>
+        </button>*@
                         @if (nf.Success is null || !nf.Success.Value)
                             {
                             <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
@@ -89,7 +89,7 @@ else
         _nfes.Remove(nfe);
     }
 
-    private async Task MailAsync(NFModel nfe)
+    /*private async Task MailAsync(NFModel nfe)
     {
         var schedule = await _context.ScheduledGenerations
             .Active()
@@ -128,5 +128,5 @@ else
         {
             _alert.Show(Alert.AlertTypes.Danger, e.Message, "Não foi possível enviar", TimeSpan.FromSeconds(15));
         }
-    }
+    }*/
 }

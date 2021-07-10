@@ -1,8 +1,11 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Data.Repositories;
@@ -14,13 +17,16 @@ namespace ThFnsc.NFe.Infra.Applications
     {
         private readonly NFContext _context;
         private readonly NFeAppService _nfe;
+        private readonly IEnumerable<INFNotifier> _nfNotifiers;
 
         public ScheduledGenerationAppService(
             NFContext context,
-            NFeAppService nfe)
+            NFeAppService nfe,
+            IEnumerable<INFNotifier> nfNotifiers)
         {
             _context = context;
             _nfe = nfe;
+            _nfNotifiers = nfNotifiers;
         }
 
         public async Task<IssuedNFe> ExecuteSchedule(int id)
@@ -29,17 +35,49 @@ namespace ThFnsc.NFe.Infra.Applications
                 .Active()
                 .OfId(id)
                 .Where(s => s.Enabled)
-                .Include(s => s.MailTemplate)
                 .Include(s => s.ToDocument)
                 .Include(s => s.Provider)
+                .Include(s => s.Notifiers)
                 .SingleAsync();
 
             var nfe = await _nfe.IssueNFeAsync(sg.Provider.Id, sg.ToDocument.Id, sg.Value, sg.ServiceId, sg.ServiceDescription, sg.AliquotPercentage);
+            
             if (!nfe.Success.Value)
                 throw new Exception(nfe.ErrorMessage);
-            if (sg.MailTemplate is not null)
-                await _nfe.MailToAsync(nfe.Id, sg.MailTemplate.Id, sg.MailList?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+
+            foreach (var notifier in sg.Notifiers)
+                BackgroundJob.Schedule(() => NotifyAsync(nfe.Id, notifier.Id), notifier.Delay);
+
             return nfe;
+        }
+
+        public async Task NotifyAsync(int nfId, int notifierId)
+        {
+            var nf = await _context.NFes
+                .Active()
+                .OfId(nfId)
+                .Include(n => n.DocumentTo.Address)
+                .Include(n => n.Provider.Issuer.Address)
+                .Include(n => n.Provider.SMTP)
+                .SingleAsync();
+
+            var notifier = await _context.NFNotifiers
+                .Active()
+                .OfId(notifierId)
+                .SingleAsync();
+
+            var notifierService = _nfNotifiers
+                .Single(n => n.GetType().FullName == notifier.NotifierType);
+
+            await notifierService.NotifyAsync(
+                data: JsonSerializer.Deserialize(
+                    json: notifier.JsonData,
+                    returnType: notifierService.DataType,
+                    options: new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }),
+                nfe: nf);
         }
 
         public async Task<ScheduledGeneration> ToggleEnableAsync(int id)
@@ -84,8 +122,6 @@ namespace ThFnsc.NFe.Infra.Applications
         public async Task<ScheduledGeneration> CreateAsync(
             string cronPattern,
             int providerId,
-            string mailList,
-            int? mailTemplateId,
             int toDocumentId,
             float value,
             float aliquotPercentage,
@@ -94,16 +130,11 @@ namespace ThFnsc.NFe.Infra.Applications
             bool enabled)
         {
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
-            var template = mailTemplateId.HasValue
-                ? await _context.MailTemplates.Active().OfId(mailTemplateId.Value).SingleAsync()
-                : null;
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
 
             var scheduledGeneration = new ScheduledGeneration(
                 cronPattern,
                 provider,
-                mailList,
-                template,
                 toDoc,
                 value,
                 aliquotPercentage,
@@ -121,8 +152,6 @@ namespace ThFnsc.NFe.Infra.Applications
             int id,
             string cronPattern,
             int providerId,
-            string mailList,
-            int? mailTemplateId,
             int toDocumentId,
             float value,
             float aliquotPercentage,
@@ -132,16 +161,11 @@ namespace ThFnsc.NFe.Infra.Applications
         {
             var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).SingleAsync();
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
-            var template = mailTemplateId.HasValue
-                ? await _context.MailTemplates.Active().OfId(mailTemplateId.Value).SingleAsync()
-                : null;
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
 
             scheduledGeneration.Update(
                 cronPattern,
                 provider,
-                mailList,
-                template,
                 toDoc,
                 value,
                 aliquotPercentage,

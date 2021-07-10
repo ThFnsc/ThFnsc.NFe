@@ -11,13 +11,13 @@ namespace ThFnsc.NFe.Data.Context
 
         public DbSet<Address> Addresses { get; private set; }
 
-        public DbSet<SMTP> SMTPs { get; set; }
+        public DbSet<SMTP> SMTPs { get; private set; }
 
-        public DbSet<Provider> Providers { get; set; }
+        public DbSet<Provider> Providers { get; private set; }
 
-        public DbSet<MailTemplate> MailTemplates { get; set; }
+        public DbSet<ScheduledGeneration> ScheduledGenerations { get; private set; }
 
-        public DbSet<ScheduledGeneration> ScheduledGenerations { get; set; }
+        public DbSet<NFNotifier> NFNotifiers { get; private set; }
 
         public NFContext(DbContextOptions<NFContext> options) : base(options) { }
     }

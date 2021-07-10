@@ -42,7 +42,7 @@ namespace ThFnsc.NFe.Infra.Applications
             return nf;
         }
 
-        public async Task MailToAsync(int nfId, int templateId, IEnumerable<string> additionalAddresses)
+        /*public async Task MailToAsync(int nfId, int templateId, IEnumerable<string> additionalAddresses)
         {
             var template = await _context.MailTemplates
                 .Active()
@@ -68,7 +68,7 @@ namespace ThFnsc.NFe.Infra.Applications
                 .Body(await _razorRenderer.RenderAsync($"mt-{template.Id}-b", template.Body, nf), true)
                 .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.xml", ContentType = "application/xml", Data = msXml })
                 .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.pdf", ContentType = "application/pdf", Data = msPdf }));
-        }
+        }*/
 
         public async Task<IssuedNFe> IssueNFeAsync(
             int providerId,

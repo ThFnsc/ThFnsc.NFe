@@ -3,6 +3,7 @@ using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Infra.Applications;
 using ThFnsc.NFe.Infra.Services;
 using ThFnsc.NFe.Infra.Services.Chrome;
+using ThFnsc.NFe.Infra.Services.ContaJa;
 
 namespace ThFnsc.NFe.Configuration
 {
@@ -17,6 +18,7 @@ namespace ThFnsc.NFe.Configuration
             services.AddSingleton<IHtmlToPDF, PuppeteerSharpHtmlToPDF>();
             services.AddSingleton<IRazorRenderer, RazorRenderer>();
             services.AddSingleton<IChromePathFinder, DumbChromeFinder>();
+            services.AddSingleton<INFNotifier, ContaJaNFeNotifier>();
             return services;
         }
     }
