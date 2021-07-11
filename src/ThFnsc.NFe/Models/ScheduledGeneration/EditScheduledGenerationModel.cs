@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ThFnsc.NFe.Models.ScheduledGeneration
 {
@@ -14,12 +15,6 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
         [Display(Name = "Prestador")]
         [Required]
         public int? ProviderId { get; set; }
-
-        [Display(Name = "Enviar para")]
-        public string MailList { get; set; }
-
-        [Display(Name = "Template do e-mail")]
-        public int? MailTemplateId { get; set; }
 
         [Display(Name = "Para o documento")]
         [Required]
@@ -43,5 +38,8 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
 
         [Display(Name = "Habilitado")]
         public bool Enabled { get; set; }
+
+        [Display(Name = "Notificadores")]
+        public List<int> NotifierIDs { get; set; } = new();
     }
 }

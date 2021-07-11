@@ -31,6 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\services\ThFnsc.NFe.Services.ContaJa\ThFnsc.NFe.Services.ContaJa.csproj" />
+    <ProjectReference Include="..\services\ThFnsc.NFe.Services.IPMNF\ThFnsc.NFe.Services.IPMNF.csproj" />
+    <ProjectReference Include="..\services\ThFnsc.NFe.Services.PuppeteerHTMLToPDF\ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj" />
+    <ProjectReference Include="..\services\ThFnsc.NFe.Services.RazorEngineRenderer\ThFnsc.NFe.Services.RazorEngineRenderer.csproj" />
+    <ProjectReference Include="..\services\ThFnsc.NFe.Services.SMTP\ThFnsc.NFe.Services.SMTP.csproj" />
     <ProjectReference Include="..\ThFnsc.NFe.Data\ThFnsc.NFe.Data.csproj" />
     <ProjectReference Include="..\ThFnsc.NFe.Infra\ThFnsc.NFe.Infra.csproj" />
   </ItemGroup>

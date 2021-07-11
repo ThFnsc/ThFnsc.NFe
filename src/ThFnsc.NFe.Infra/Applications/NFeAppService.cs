@@ -1,13 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;
-using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Data.Repositories;
 
 namespace ThFnsc.NFe.Infra.Applications
@@ -16,19 +14,13 @@ namespace ThFnsc.NFe.Infra.Applications
     {
         private readonly IEnumerable<ITownHallApiClient> _clients;
         private readonly NFContext _context;
-        private readonly SMTPAppService _smtp;
-        private readonly IRazorRenderer _razorRenderer;
 
         public NFeAppService(
             IEnumerable<ITownHallApiClient> clients,
-            NFContext context,
-            SMTPAppService smtp,
-            IRazorRenderer razorRenderer)
+            NFContext context)
         {
             _clients = clients;
             _context = context;
-            _smtp = smtp;
-            _razorRenderer = razorRenderer;
         }
 
         public async Task<IssuedNFe> DeleteAsync(int id)
@@ -40,34 +32,6 @@ namespace ThFnsc.NFe.Infra.Applications
             nf.Delete();
             await _context.SaveChangesAsync();
             return nf;
-        }
-
-        public async Task MailToAsync(int nfId, int templateId, IEnumerable<string> additionalAddresses)
-        {
-            var template = await _context.MailTemplates
-                .Active()
-                .OfId(templateId)
-                .SingleAsync();
-
-            var nf = await _context.NFes
-                .OfId(nfId)
-                .Include(n => n.Provider.SMTP)
-                .Include(n => n.Provider.Issuer.Address)
-                .Include(n => n.DocumentTo.Address)
-                .SingleAsync();
-
-            using var msXml = new MemoryStream(Encoding.UTF8.GetBytes(nf.ReturnedXMLContent));
-            using var msPdf = new MemoryStream(nf.ReturnedPDF);
-
-            await _smtp.SendMailAsync(nf.Provider.SMTP.Id, async msg => msg
-                .To(new[] { nf.Provider.SMTP.Account }
-                    .Concat(additionalAddresses ?? Array.Empty<string>())
-                    .Distinct()
-                    .Select(m => new FluentEmail.Core.Models.Address(m, null)))
-                .Subject(await _razorRenderer.RenderAsync($"mt-{template.Id}-s", template.Subject, nf))
-                .Body(await _razorRenderer.RenderAsync($"mt-{template.Id}-b", template.Body, nf), true)
-                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.xml", ContentType = "application/xml", Data = msXml })
-                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nf.Series}.pdf", ContentType = "application/pdf", Data = msPdf }));
         }
 
         public async Task<IssuedNFe> IssueNFeAsync(

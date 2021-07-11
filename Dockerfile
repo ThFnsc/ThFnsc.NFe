@@ -1,17 +1,15 @@
 ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=21.04
-ARG NODE_VERSION=14
 ARG DOTNET_VERSION=5.0
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ base stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM $DISTRO:$DISTRO_VERSION AS base
 ARG DISTRO
 ARG DISTRO_VERSION
-ARG NODE_VERSION
 
 #Basic packages
 RUN apt-get update
-RUN apt-get install -y curl wget gnupg ca-certificates procps libxss1 apt-transport-https
+RUN apt-get install -y wget gnupg ca-certificates procps libxss1 apt-transport-https
 
 #Dotnet
 RUN wget https://packages.microsoft.com/config/${DISTRO}/${DISTRO_VERSION}/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
@@ -19,16 +17,27 @@ RUN wget https://packages.microsoft.com/config/${DISTRO}/${DISTRO_VERSION}/packa
 	&& rm packages-microsoft-prod.deb
 
 #Chromium
+ARG DEBIAN_FRONTEND=noninteractive
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 
-#NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash -
-
-#Install chromium and nodejs
+#Install chromium
 RUN apt-get update
-RUN apt-get install -y google-chrome-stable nodejs
+RUN apt-get install -y google-chrome-stable
 
+#~~~~~~~~~~~~~~~~~~~~~~~~ restore files extraction stage ~~~~~~~~~~~~~~~~~~~~~~~~#
+FROM $DISTRO:$DISTRO_VERSION AS restore
+WORKDIR src
+
+#Copy all project files
+COPY . .
+
+#Make a tarball with only the .csproj and .sln files
+RUN find . \( -name *.csproj -or -name *.sln \) -print0 | tar -cvf restore.tar --null -T -
+
+#Extract the tarball into /restore
+RUN mkdir /restore
+RUN tar -xvf restore.tar -C /restore
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ build stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM base AS build
@@ -39,12 +48,9 @@ RUN apt-get install -y dotnet-sdk-$DOTNET_VERSION
 
 #Copy files for restore
 WORKDIR /src
-COPY ThFnsc.NFe.sln .
-COPY src/ThFnsc.NFe/ThFnsc.NFe.csproj src/ThFnsc.NFe/
-COPY src/ThFnsc.NFe.Core/ThFnsc.NFe.Core.csproj src/ThFnsc.NFe.Core/
-COPY src/ThFnsc.NFe.Data/ThFnsc.NFe.Data.csproj src/ThFnsc.NFe.Data/
-COPY src/ThFnsc.NFe.Infra/ThFnsc.NFe.Infra.csproj src/ThFnsc.NFe.Infra/
-COPY tests/ThFnsc.NFe.Tests/ThFnsc.NFe.Tests.csproj tests/ThFnsc.NFe.Tests/
+
+#Copy only the .csproj and .sln files
+COPY --from=restore /restore ./
 
 #Restore
 RUN dotnet restore
@@ -93,7 +99,7 @@ COPY --from=publish /app/publish/wwwroot ./wwwroot
 
 #Copy the important stuff
 COPY --from=publish /app/publish/[^ThFnsc.NFe]*.dll ./
-COPY --from=publish /app/publish ./
-COPY --from=test /src/TestResults ./
+COPY --from=publish /app/publish .
+COPY --from=test /src/TestResults .
 
 ENTRYPOINT dotnet ThFnsc.NFe.dll

@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /data
 /mysql_data
 /keys
+/docker-compose.override.yml

@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\services\ThFnsc.NFe.Services.PuppeteerHTMLToPDF\ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj" />
+    <ProjectReference Include="..\..\src\services\ThFnsc.NFe.Services.RazorEngineRenderer\ThFnsc.NFe.Services.RazorEngineRenderer.csproj" />
     <ProjectReference Include="..\..\src\ThFnsc.NFe.Infra\ThFnsc.NFe.Infra.csproj" />
   </ItemGroup>
 

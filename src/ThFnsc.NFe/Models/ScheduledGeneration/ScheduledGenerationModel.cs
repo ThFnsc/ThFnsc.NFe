@@ -1,5 +1,6 @@
-﻿using ThFnsc.NFe.Models.Document;
-using ThFnsc.NFe.Models.MailTemplate;
+﻿using System.Collections.Generic;
+using ThFnsc.NFe.Models.Document;
+using ThFnsc.NFe.Models.Notifier;
 using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe.Models.ScheduledGeneration
@@ -12,10 +13,6 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
 
         public ProviderModel Provider { get; set; }
 
-        public string MailList { get; set; }
-
-        public MailTemplateModel MailTemplate { get; set; }
-
         public DocumentModel ToDocument { get; set; }
 
         public float Value { get; set; }
@@ -27,5 +24,7 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
         public string ServiceDescription { get; set; }
 
         public bool Enabled { get; set; }
+
+        public List<NotifierModel> Notifiers { get; set; }
     }
 }

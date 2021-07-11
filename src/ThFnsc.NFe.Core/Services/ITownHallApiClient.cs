@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Models;
-using ThFnsc.NFe.Data.Entities;
 
 namespace ThFnsc.NFe.Core.Services
 {
@@ -9,8 +9,6 @@ namespace ThFnsc.NFe.Core.Services
     {
         Task<TownHallResponse> GenerateAsync(IssuedNFe nfe);
 
-        public Type ModelType { get; }
-
-        public object DefaultModelData { get; }
+        public Type DataType { get; }
     }
 }

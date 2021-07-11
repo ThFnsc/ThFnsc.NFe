@@ -1,0 +1,11 @@
+﻿@page "/Notifiers"
+@attribute [PageDisplay(Name = "Notificadores", OpenIcon = "bell")]
+
+<EditNotifier @ref="_edit" OnUpdate="()=>_list.UpdateAsync()"/>
+<hr />
+<NotifierList OnEdit="id=>_edit.EditAsync(id)" @ref="_list" />
+
+@code {
+    private EditNotifier _edit;
+    private NotifierList _list;
+}

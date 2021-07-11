@@ -1,20 +1,21 @@
-﻿@inject NFContext _context
+﻿@using ThFnsc.NFe.Core.Services
+@using ThFnsc.NFe.Models.Provider
+
+@inject NFContext _context
 @inject IMapper _mapper
 @inject IJSRuntime _js
-@using ThFnsc.NFe.Models.Provider
+@inject IEnumerable<ITownHallApiClient> _clients
 
 <LoadableList Items="_list">
     <TList Items="_list">
         <TableHeader>
             <td>Documento</td>
             <td>Prefeitura</td>
-            <td>SMTP</td>
             <td>Ações</td>
         </TableHeader>
         <Row Context="item">
             <td>@item.Issuer.DocIdentifier @item.Issuer.Name</td>
-            <td>@item.TownHallType</td>
-            <td>@item.SMTP.Account</td>
+            <td>@(_clients.SingleOrDefault(n=>n.GetType().FullName == item.TownHallType)?.GetType().GetDisplayName() ?? "NÃO ENCONTRADA!")</td>
             <td>
                 <div class="btn btn-group">
                     <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>

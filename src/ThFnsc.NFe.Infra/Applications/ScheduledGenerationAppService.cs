@@ -1,10 +1,11 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Data.Context;
-using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Data.Repositories;
 
 namespace ThFnsc.NFe.Infra.Applications
@@ -29,18 +30,23 @@ namespace ThFnsc.NFe.Infra.Applications
                 .Active()
                 .OfId(id)
                 .Where(s => s.Enabled)
-                .Include(s => s.MailTemplate)
                 .Include(s => s.ToDocument)
                 .Include(s => s.Provider)
+                .Include(s => s.Notifiers)
                 .SingleAsync();
 
             var nfe = await _nfe.IssueNFeAsync(sg.Provider.Id, sg.ToDocument.Id, sg.Value, sg.ServiceId, sg.ServiceDescription, sg.AliquotPercentage);
+
             if (!nfe.Success.Value)
                 throw new Exception(nfe.ErrorMessage);
-            if (sg.MailTemplate is not null)
-                await _nfe.MailToAsync(nfe.Id, sg.MailTemplate.Id, sg.MailList?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+
+            foreach (var notifier in sg.Notifiers)
+                BackgroundJob.Schedule<NotificationAppService>(nas => nas.NotifyAsync(nfe.Id, notifier.Id), notifier.Delay);
+
             return nfe;
         }
+
+
 
         public async Task<ScheduledGeneration> ToggleEnableAsync(int id)
         {
@@ -84,32 +90,30 @@ namespace ThFnsc.NFe.Infra.Applications
         public async Task<ScheduledGeneration> CreateAsync(
             string cronPattern,
             int providerId,
-            string mailList,
-            int? mailTemplateId,
             int toDocumentId,
             float value,
             float aliquotPercentage,
             int serviceId,
             string serviceDescription,
-            bool enabled)
+            bool enabled,
+            IEnumerable<int> notifiers)
         {
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
-            var template = mailTemplateId.HasValue
-                ? await _context.MailTemplates.Active().OfId(mailTemplateId.Value).SingleAsync()
-                : null;
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
+            var notifiersOnDb = await _context.NFNotifiers.Where(n => notifiers.Contains(n.Id)).ToListAsync();
 
             var scheduledGeneration = new ScheduledGeneration(
                 cronPattern,
                 provider,
-                mailList,
-                template,
                 toDoc,
                 value,
                 aliquotPercentage,
                 serviceId,
                 serviceDescription,
                 enabled);
+
+            foreach (var notifier in notifiersOnDb)
+                scheduledGeneration.Notifiers.Add(notifier);
 
             _context.Add(scheduledGeneration);
             await _context.SaveChangesAsync();
@@ -121,33 +125,32 @@ namespace ThFnsc.NFe.Infra.Applications
             int id,
             string cronPattern,
             int providerId,
-            string mailList,
-            int? mailTemplateId,
             int toDocumentId,
             float value,
             float aliquotPercentage,
             int serviceId,
             string serviceDescription,
-            bool enabled)
+            bool enabled,
+            IEnumerable<int> notifiers)
         {
-            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).SingleAsync();
+            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).Include(s => s.Notifiers).SingleAsync();
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
-            var template = mailTemplateId.HasValue
-                ? await _context.MailTemplates.Active().OfId(mailTemplateId.Value).SingleAsync()
-                : null;
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
+            var notifiersOnDb = await _context.NFNotifiers.Active().Where(n => notifiers.Contains(n.Id)).ToListAsync();
 
             scheduledGeneration.Update(
                 cronPattern,
                 provider,
-                mailList,
-                template,
                 toDoc,
                 value,
                 aliquotPercentage,
                 serviceId,
                 serviceDescription,
                 enabled);
+
+            scheduledGeneration.Notifiers.Clear();
+            foreach (var notifier in notifiersOnDb)
+                scheduledGeneration.Notifiers.Add(notifier);
 
             await _context.SaveChangesAsync();
             UpdateRecurringJob(scheduledGeneration);
