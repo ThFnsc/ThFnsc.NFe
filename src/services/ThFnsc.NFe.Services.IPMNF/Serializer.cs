@@ -6,7 +6,7 @@ using ThFnsc.NFe.Services.IPMNF.Models;
 
 namespace ThFnsc.NFe.Services.IPMNF
 {
-    public static class Serializer
+    internal static class Serializer
     {
         private static readonly CultureInfo _culture = new CultureInfo("pt-br");
 

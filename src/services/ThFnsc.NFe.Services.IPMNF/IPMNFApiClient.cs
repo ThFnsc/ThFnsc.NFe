@@ -17,9 +17,7 @@ namespace ThFnsc.NFe.Services.IPMNF
         private readonly HttpClient _client;
         private readonly IHtmlToPDF _htmlToPDF;
 
-        public Type ModelType => typeof(DataModel);
-
-        public object DefaultModelData => DataModel.Example();
+        public Type DataType => typeof(DataModel);
 
         public IPMNFApiClient(
             HttpClient client,

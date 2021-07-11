@@ -9,8 +9,6 @@ namespace ThFnsc.NFe.Core.Services
     {
         Task<TownHallResponse> GenerateAsync(IssuedNFe nfe);
 
-        public Type ModelType { get; }
-
-        public object DefaultModelData { get; }
+        public Type DataType { get; }
     }
 }

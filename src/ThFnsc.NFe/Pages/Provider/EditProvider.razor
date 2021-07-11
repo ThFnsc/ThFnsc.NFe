@@ -1,11 +1,12 @@
-﻿@inject NFContext _context
-@inject IMapper _mapper
-@inject SMTPAppService _smtp
-@inject IEnumerable<ITownHallApiClient> _apiClients
-@using ThFnsc.NFe.Models.Provider
+﻿@using ThFnsc.NFe.Models.Provider
 @using System.Reflection
 @using ThFnsc.NFe.Core.Services
 @using System.Text.Json
+
+@inject NFContext _context
+@inject IMapper _mapper
+@inject SMTPAppService _smtp
+@inject IEnumerable<ITownHallApiClient> _apiClients
 
 @if (_model is null || _documents is null || _smtps is null)
 {
@@ -13,7 +14,7 @@
 }
 else
 {
-    <EditForm EditContext="_editContext" OnValidSubmit="SaveAsync" class="row g-3">
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
         <DataAnnotationsValidator />
         <div class="col-lg-4">
             <LabelFor For="() => _model.DocumentId" />
@@ -43,10 +44,10 @@ else
             <LabelFor For="() => _model.TownHallType" />
             <InputSelect @bind-Value="_model.TownHallType" class="form-control">
                 <option value="">Selecionar</option>
-                @foreach (var item in _townHallNames.Value)
-                    {
-                    <option value="@item.Key">@item.Value</option>
-                    }
+                @foreach (var item in _townHalls)
+                {
+                    <option value="@item.Key">@item.Value.title</option>
+                }
             </InputSelect>
             <ValidationMessage For="()=>_model.TownHallType" />
         </div>
@@ -57,7 +58,7 @@ else
                     <Name For="()=>_model.Data" />
                 </Heading>
                 <Content>
-                    <InputTextArea rows="10" @bind-Value="_model.Data" class="form-control" style="font-family:monospace" />
+                    <InputJson ModelType="string.IsNullOrWhiteSpace(_model.TownHallType) ? typeof(object) : _townHalls[_model.TownHallType].client.DataType" @bind-Value="_model.Data" class="form-control" />
                 </Content>
             </Accordion>
             <ValidationMessage For="()=>_model.Data" />
@@ -81,41 +82,23 @@ else
 
 @code {
     private EditProviderModel _model = new();
-    private EditContext _editContext;
-    private ValidationMessageStore _messageStore;
     private Provider _editing;
     private bool _processing;
     private IDictionary<int, string> _documents;
     private IDictionary<int, string> _smtps;
 
-    private static Lazy<IDictionary<string, Type>> _townHalls = new(() =>
-          AppDomain.CurrentDomain.GetAssemblies()
-              .Where(a => a.GetName().Name.StartsWith(nameof(ThFnsc)))
-              .SelectMany(a => a.GetTypes())
-              .Where(t => t.GetInterfaces().Contains(typeof(ITownHallApiClient)))
-              .ToDictionary(t => t.FullName, t => t));
-    private static Lazy<IDictionary<string, string>> _townHallNames = new(() =>
-        _townHalls.Value
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetCustomAttribute<DisplayAttribute>()?.Name ?? kvp.Value.Name));
+    private Dictionary<string, (ITownHallApiClient client, string title)> _townHalls;
 
     [Parameter]
     public EventCallback<ProviderModel> OnUpdate { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _editContext = new EditContext(_model);
-        _editContext.OnFieldChanged += (_, e) =>
-        {
-            _messageStore.Clear(() => _model.Data);
-            ReparseData();
-            _editContext.NotifyValidationStateChanged();
-        };
-        _messageStore = new ValidationMessageStore(_editContext);
-        _editContext.OnValidationRequested += (_, _) => _messageStore.Clear(() => _model.Data);
+        _townHalls= _apiClients.ToDictionary(n => n.GetType().FullName, n => (n, n.GetType().GetDisplayName()));
 
         _smtps = await _context.SMTPs
-            .Active()
-            .ToDictionaryAsync(d => d.Id, d => d.Account);
+        .Active()
+        .ToDictionaryAsync(d => d.Id, d => d.Account);
 
         _documents = await _context.Documents
             .Active()
@@ -134,35 +117,8 @@ else
             .Include(d => d.Issuer)
             .SingleAsync();
         _model = _mapper.Map<EditProviderModel>(_editing);
-        ReparseData();
         _processing = false;
         StateHasChanged();
-    }
-
-    private void ReparseData()
-    {
-        if (_townHalls.Value.TryGetValue(_model.TownHallType ?? "", out var thType))
-        {
-            var th = _apiClients.SingleOrDefault(c => c.GetType() == thType);
-            if (th is not null)
-            {
-                try
-                {
-                    var deserialized = string.IsNullOrWhiteSpace(_model.Data)
-                        ? th.DefaultModelData
-                        : JsonSerializer.Deserialize(_model.Data, th.ModelType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    _model.Data = JsonSerializer.Serialize(deserialized, th.ModelType, new JsonSerializerOptions { WriteIndented = true });
-                }
-                catch (Exception e)
-                {
-                    _messageStore.Add(() => _model.Data, $"Erro ao interpretar os dados: {e.Message}");
-                }
-            }
-            else
-                _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura especificada não existe");
-        }
-        else
-            _messageStore.Add(_editContext.Field(nameof(_model.Data)), "Prefeitura ainda não definida");
     }
 
     private async Task SaveAsync()
