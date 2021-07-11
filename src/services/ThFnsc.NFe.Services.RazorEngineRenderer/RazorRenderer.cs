@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 
-namespace ThFnsc.NFe.Infra.Services
+namespace ThFnsc.NFe.Services.RazorEngineRenderer
 {
     public class RazorRenderer : IRazorRenderer
     {

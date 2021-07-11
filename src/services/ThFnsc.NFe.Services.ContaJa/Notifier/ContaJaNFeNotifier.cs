@@ -6,20 +6,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Services;
+using ThFnsc.NFe.Infra.Services.Chrome;
 
 namespace ThFnsc.NFe.Services.ContaJa.Notifier
 {
     [Display(Name = "ContaJá")]
     public class ContaJaNFeNotifier : INFNotifier
     {
-        private readonly IChromePathFinder _chromePathFinder;
         private readonly IRazorRenderer _razorRenderer;
 
         public ContaJaNFeNotifier(
-            IChromePathFinder chromePathFinder,
             IRazorRenderer razorRenderer)
         {
-            _chromePathFinder = chromePathFinder;
             _razorRenderer = razorRenderer;
         }
 
@@ -33,7 +31,7 @@ namespace ThFnsc.NFe.Services.ContaJa.Notifier
             {
                 Headless = true,
                 Args = new[] { "--no-sandbox" },
-                ExecutablePath = await _chromePathFinder.FindChromeAsync()
+                ExecutablePath = await ChromeFinder.FindChromeAsync()
             });
 
             //Create a temporary file to hold the XML

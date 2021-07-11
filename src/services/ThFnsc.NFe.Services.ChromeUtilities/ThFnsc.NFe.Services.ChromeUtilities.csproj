@@ -5,12 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PuppeteerSharp" Version="4.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\ThFnsc.NFe.Core\ThFnsc.NFe.Core.csproj" />
-    <ProjectReference Include="..\ThFnsc.NFe.Services.ChromeUtilities\ThFnsc.NFe.Services.ChromeUtilities.csproj" />
   </ItemGroup>
 
 </Project>

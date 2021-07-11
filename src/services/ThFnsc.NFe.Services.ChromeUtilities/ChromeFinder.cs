@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ThFnsc.NFe.Core.Services;
 
 namespace ThFnsc.NFe.Infra.Services.Chrome
 {
-    public class DumbChromeFinder : IChromePathFinder
+    public static class ChromeFinder
     {
         private static string[] _possiblePaths = new string[]
         {
@@ -21,7 +20,7 @@ namespace ThFnsc.NFe.Infra.Services.Chrome
             throw new FileNotFoundException("No chrome executable found in predefined paths");
         });
 
-        public Task<string> FindChromeAsync() =>
+        public static Task<string> FindChromeAsync() =>
             Task.FromResult(_finder.Value);
     }
 }
