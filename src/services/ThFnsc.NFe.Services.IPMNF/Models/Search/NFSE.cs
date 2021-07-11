@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace ThFnsc.NFe.Infra.IPMNF.Models.Search
+namespace ThFnsc.NFe.Services.IPMNF.Models.Search
 {
     [XmlRoot("nfse")]
     public class NFSE

@@ -6,10 +6,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
-using ThFnsc.NFe.Data.Entities;
-using ThFnsc.NFe.Infra.IPMNF.Models;
+using ThFnsc.NFe.Core.Entities;
+using ThFnsc.NFe.Services.IPMNF.Models;
 
-namespace ThFnsc.NFe.Infra.IPMNF
+namespace ThFnsc.NFe.Services.IPMNF
 {
     [Display(Name = "IPM Fiscal")]
     public class IPMNFApiClient : ITownHallApiClient

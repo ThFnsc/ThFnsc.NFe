@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Core.Entities;
 
 namespace ThFnsc.NFe.Core.Services
 {

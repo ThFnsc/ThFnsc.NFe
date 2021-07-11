@@ -3,7 +3,7 @@ using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Infra.Applications;
 using ThFnsc.NFe.Infra.Services;
 using ThFnsc.NFe.Infra.Services.Chrome;
-using ThFnsc.NFe.Infra.Services.ContaJa;
+using ThFnsc.NFe.Services.ContaJa.Notifier;
 
 namespace ThFnsc.NFe.Configuration
 {

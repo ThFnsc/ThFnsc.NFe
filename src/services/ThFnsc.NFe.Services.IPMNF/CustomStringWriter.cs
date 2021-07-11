@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace ThFnsc.NFe.Infra.IPMNF
+namespace ThFnsc.NFe.Services.IPMNF
 {
     public class CustomStringWriter : StringWriter
     {

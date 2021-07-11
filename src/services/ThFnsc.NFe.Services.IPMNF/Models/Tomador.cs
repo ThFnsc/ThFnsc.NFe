@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace ThFnsc.NFe.Infra.IPMNF.Models
+namespace ThFnsc.NFe.Services.IPMNF.Models
 {
     public class Tomador
     {

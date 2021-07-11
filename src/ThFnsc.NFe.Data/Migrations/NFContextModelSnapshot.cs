@@ -17,7 +17,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.7");
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Address", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Document", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Document", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -107,7 +107,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("Documents");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.IssuedNFe", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.IssuedNFe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -185,7 +185,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("NFes");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.NFNotifier", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.NFNotifier", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -223,7 +223,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("NFNotifiers");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Provider", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Provider", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,7 +260,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("Providers");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.SMTP", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.SMTP", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -302,7 +302,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("SMTPs");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.ScheduledGeneration", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -353,22 +353,22 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("ScheduledGenerations");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Document", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Document", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Address", "Address")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.IssuedNFe", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.IssuedNFe", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Document", "DocumentTo")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Document", "DocumentTo")
                         .WithMany()
                         .HasForeignKey("DocumentToId");
 
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Provider", "Provider")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Provider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId");
 
@@ -377,20 +377,20 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Navigation("Provider");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.NFNotifier", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.NFNotifier", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Data.Entities.ScheduledGeneration", null)
+                    b.HasOne("ThFnsc.NFe.Core.Entities.ScheduledGeneration", null)
                         .WithMany("Notifiers")
                         .HasForeignKey("ScheduledGenerationId");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.Provider", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Provider", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Document", "Issuer")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Document", "Issuer")
                         .WithMany()
                         .HasForeignKey("IssuerId");
 
-                    b.HasOne("ThFnsc.NFe.Data.Entities.SMTP", "SMTP")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.SMTP", "SMTP")
                         .WithMany()
                         .HasForeignKey("SMTPId");
 
@@ -399,13 +399,13 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Navigation("SMTP");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.ScheduledGeneration", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Provider", "Provider")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Provider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId");
 
-                    b.HasOne("ThFnsc.NFe.Data.Entities.Document", "ToDocument")
+                    b.HasOne("ThFnsc.NFe.Core.Entities.Document", "ToDocument")
                         .WithMany()
                         .HasForeignKey("ToDocumentId");
 
@@ -414,7 +414,7 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Navigation("ToDocument");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Data.Entities.ScheduledGeneration", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
                 {
                     b.Navigation("Notifiers");
                 });

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Core.Entities;
 
 namespace ThFnsc.NFe.Data.Context
 {

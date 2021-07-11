@@ -1,4 +1,4 @@
-﻿namespace ThFnsc.NFe.Infra.IPMNF.Models
+﻿namespace ThFnsc.NFe.Services.IPMNF.Models
 {
     public class DataModel
     {

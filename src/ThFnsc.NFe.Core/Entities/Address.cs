@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using ThFnsc.NFe.Data.Entities.Shared;
+using ThFnsc.NFe.Core.Entities.Shared;
 
-namespace ThFnsc.NFe.Data.Entities
+namespace ThFnsc.NFe.Core.Entities
 {
     [Index(nameof(PostalCode))]
     [Index(nameof(CityId))]

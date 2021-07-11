@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ThFnsc.NFe.Data.Entities.Shared
+namespace ThFnsc.NFe.Core.Entities.Shared
 {
     [Index(nameof(CreatedAt))]
     public abstract class BaseEntity

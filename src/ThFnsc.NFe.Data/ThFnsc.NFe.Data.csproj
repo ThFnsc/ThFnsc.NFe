@@ -20,4 +20,8 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ThFnsc.NFe.Core\ThFnsc.NFe.Core.csproj" />
+  </ItemGroup>
+
 </Project>

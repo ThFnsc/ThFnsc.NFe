@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
-using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Core.Entities;
 
-namespace ThFnsc.NFe.Infra.Services.ContaJa
+namespace ThFnsc.NFe.Services.ContaJa.Notifier
 {
     [Display(Name = "ContaJá")]
     public class ContaJaNFeNotifier : INFNotifier

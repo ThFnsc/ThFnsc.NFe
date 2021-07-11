@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using ThFnsc.NFe.Data.Entities;
+using ThFnsc.NFe.Core.Entities;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.NFe;

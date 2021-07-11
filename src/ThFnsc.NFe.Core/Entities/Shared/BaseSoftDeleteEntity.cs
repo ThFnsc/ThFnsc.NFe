@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace ThFnsc.NFe.Data.Entities.Shared
+namespace ThFnsc.NFe.Core.Entities.Shared
 {
     [Index(nameof(DeletedAt))]
     public abstract class BaseSoftDeleteEntity : BaseEntity

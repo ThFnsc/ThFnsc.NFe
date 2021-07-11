@@ -1,4 +1,4 @@
-﻿namespace ThFnsc.NFe.Infra.Services.ContaJa
+﻿namespace ThFnsc.NFe.Services.ContaJa.Notifier
 {
     public class ContaJaNotifierModel
     {

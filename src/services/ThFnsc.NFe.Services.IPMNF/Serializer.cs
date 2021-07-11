@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Xml.Serialization;
-using ThFnsc.NFe.Data.Entities;
-using ThFnsc.NFe.Infra.IPMNF.Models;
+using ThFnsc.NFe.Core.Entities;
+using ThFnsc.NFe.Services.IPMNF.Models;
 
-namespace ThFnsc.NFe.Infra.IPMNF
+namespace ThFnsc.NFe.Services.IPMNF
 {
     public static class Serializer
     {
