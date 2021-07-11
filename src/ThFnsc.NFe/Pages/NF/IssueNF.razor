@@ -1,7 +1,9 @@
-﻿@inject NFeAppService _nfe
+﻿@using ThFnsc.NFe.Models.NFe
+
+@inject NFeAppService _nfe
 @inject NFContext _context
 @inject IJSRuntime _js
-@using ThFnsc.NFe.Models.NFe
+@inject IMapper _mapper
 
 @if (_model is null)
 {
@@ -81,24 +83,18 @@ else
     {
         _documents = await _context.Documents
             .Active()
+            .Select(d => new { d.Id, d.Name })
             .ToDictionaryAsync(d => d.Id, d => d.Name);
 
         _providers = await _context.Providers
             .Active()
-            .ToDictionaryAsync(d => d.Id, d => d.Issuer.Name);
+            .Select(p => new { p.Id, IssuerName = p.Issuer.Name })
+            .ToDictionaryAsync(d => d.Id, d => d.IssuerName);
 
         _model = await _context.NFes
             .Active()
             .OrderBy(n => n.Id)
-            .Select(nf => new GenerateNFModel
-            {
-                AliquotPercentage = nf.AliquotPercentage,
-                FromId = nf.Provider.Id,
-                ServiceDescription = nf.ServiceDescription,
-                ServiceId = nf.ServiceId,
-                ToId = nf.DocumentTo.Id,
-                Value = nf.Value
-            })
+            .ProjectTo<GenerateNFModel>(_mapper.ConfigurationProvider)
             .LastOrDefaultAsync();
 
         if (_model is null)

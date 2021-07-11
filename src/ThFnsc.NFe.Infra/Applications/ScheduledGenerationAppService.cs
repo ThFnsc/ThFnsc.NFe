@@ -133,7 +133,7 @@ namespace ThFnsc.NFe.Infra.Applications
             bool enabled,
             IEnumerable<int> notifiers)
         {
-            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).Include(s=>s.Notifiers).SingleAsync();
+            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).Include(s => s.Notifiers).SingleAsync();
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
             var notifiersOnDb = await _context.NFNotifiers.Active().Where(n => notifiers.Contains(n.Id)).ToListAsync();

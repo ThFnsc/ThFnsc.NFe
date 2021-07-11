@@ -31,6 +31,9 @@ namespace ThFnsc.NFe
         private void NFMappings()
         {
             CreateMap<IssuedNFe, NFModel>();
+            CreateMap<IssuedNFe, GenerateNFModel>()
+                .ForMember(m => m.FromId, res => res.MapFrom(m => m.Provider.Id))
+                .ForMember(m => m.ToId, res => res.MapFrom(m => m.DocumentTo.Id));
         }
 
         private void ScheduledGenerationMappings()
@@ -42,7 +45,7 @@ namespace ThFnsc.NFe
                 .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.DocumentTo.Id));
 
             CreateMap<ScheduledGeneration, EditScheduledGenerationModel>()
-                .ForMember(m => m.NotifierIDs, res => res.MapFrom(m => m.Notifiers.Select(n=>n.Id)))
+                .ForMember(m => m.NotifierIDs, res => res.MapFrom(m => m.Notifiers.Select(n => n.Id)))
                 .ForMember(m => m.ProviderId, res => res.MapFrom(m => m.Provider.Id))
                 .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.ToDocument.Id));
         }

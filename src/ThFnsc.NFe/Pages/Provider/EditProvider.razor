@@ -84,6 +84,7 @@ else
 
         _documents = await _context.Documents
             .Active()
+            .Select(d => new { d.Id, d.DocIdentifier, d.Name })
             .ToDictionaryAsync(d => d.Id, d => $"{d.DocIdentifier} {d.Name}");
     }
 
