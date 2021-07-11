@@ -93,12 +93,12 @@ HEALTHCHECK --interval=5s --timeout=1s CMD wget --no-verbose --tries=1 --spider 
 COPY --from=publish /app/publish/runtimes ./runtimes
 COPY --from=publish /app/publish/InstrumentationEngine ./InstrumentationEngine
 COPY --from=publish /app/publish/CodeCoverage ./CodeCoverage
-COPY --from=publish /app/publish/?? .
-COPY --from=publish /app/publish/??-??* .
+COPY --from=publish /app/publish/?? ./
+COPY --from=publish /app/publish/??-??* ./
 COPY --from=publish /app/publish/wwwroot ./wwwroot
 
 #Copy the important stuff
-COPY --from=publish /app/publish/[^ThFnsc.NFe]*.dll .
+COPY --from=publish /app/publish/[^ThFnsc.NFe]*.dll ./
 COPY --from=publish /app/publish .
 COPY --from=test /src/TestResults .
 
