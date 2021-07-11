@@ -1,0 +1,122 @@
+﻿@using ThFnsc.NFe.Models.Notifier
+@using ThFnsc.NFe.Core.Services
+
+@inject NFContext _context
+@inject IMapper _mapper
+@inject IEnumerable<INFNotifier> _notifiers
+
+<Alert @ref="_alert" />
+
+@if (_model is null)
+{
+    <Loader />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
+        <DataAnnotationsValidator />
+
+        <div class="col-lg-4">
+            <LabelFor For="()=>_model.Title" />
+            <InputText @bind-Value="_model.Title" class="form-control" />
+            <ValidationMessage For="()=>_model.Title" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="()=>_model.NotifierType" />
+            <InputSelect @bind-Value="_model.NotifierType" class="form-control">
+                <option value="">Selecionar</option>
+                @foreach (var item in _notifierDict)
+                    {
+                    <option value="@item.Key">@item.Value.title</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="()=>_model.NotifierType" />
+        </div>
+
+        <div class="col-lg-4">
+            <LabelFor For="()=>_model.Delay" />
+            <InputTimeSpan @bind-Value="_model.Delay" class="form-control" />
+            <ValidationMessage For="()=>_model.Delay" />
+        </div>
+
+        <div class="col-12">
+            <Accordion>
+                <Heading>
+                    <Name For="()=>_model.JsonData" />
+                </Heading>
+                <Content>
+                    <InputJson ModelType="string.IsNullOrWhiteSpace(_model.NotifierType) ? typeof(object) : _notifierDict[_model.NotifierType].notifier.DataType" @bind-Value="_model.JsonData" class="form-control" />
+                </Content>
+            </Accordion>
+            <ValidationMessage For="()=>_model.JsonData" />
+        </div>
+
+        <div class="col-12">
+            <div class="btn-group">
+                @if (_model.Id == 0)
+                {
+                    <button type="submit" class="btn btn-success">Criar <Loader Button="true" Visible="_processing" /></button>
+                }
+                else
+                {
+
+                    <button type="submit" class="btn btn-primary">Salvar <Loader Button="true" Visible="_processing" /></button>
+                    <button type="button" class="btn btn-secondary" @onclick="()=>_model=new()">Novo</button>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private NFNotifier _editing;
+    private EditNotifierModel _model = new();
+    private bool _processing;
+    private Alert _alert;
+    private Dictionary<string, (INFNotifier notifier, string title)> _notifierDict;
+
+    protected override void OnInitialized()
+    {
+        _notifierDict = _notifiers.ToDictionary(n => n.GetType().FullName, n => (n, n.GetType().GetDisplayName()));
+    }
+
+    public async Task EditAsync(int id)
+    {
+        _processing = true;
+        _model = null;
+        StateHasChanged();
+        _editing = await _context.NFNotifiers
+            .Active()
+            .OfId(id)
+            .SingleAsync();
+        _model = _mapper.Map<EditNotifierModel>(_editing);
+        _processing = false;
+        StateHasChanged();
+    }
+
+    [Parameter]
+    public EventCallback OnUpdate { get; set; }
+
+    private async Task SaveAsync()
+    {
+        _alert.Hide();
+        _processing = true;
+        if (_model.Id == 0)
+        {
+            var notifier = new NFNotifier(_model.Title, _model.NotifierType, _model.JsonData, _model.Delay);
+            _context.Add(notifier);
+            await _context.SaveChangesAsync();
+            _model = new();
+            await OnUpdate.InvokeAsync();
+        }
+        else
+        {
+            _editing.Update(_model.Title, _model.NotifierType, _model.JsonData, _model.Delay);
+            await _context.SaveChangesAsync();
+            _model = new();
+            await OnUpdate.InvokeAsync();
+        }
+        _processing = false;
+    }
+}

@@ -1,0 +1,61 @@
+﻿@inject NFContext _context
+@inject IMapper _mapper
+@inject IJSRuntime _js
+@inject IEnumerable<INFNotifier> _notifiers
+@using ThFnsc.NFe.Models.Notifier
+@using ThFnsc.NFe.Core.Services
+
+<LoadableList Items="_list">
+    <TList Items="_list">
+        <TableHeader>
+            <td>Título</td>
+            <td>Tipo</td>
+            <td>Delay</td>
+        </TableHeader>
+        <Row Context="item">
+            <td>@item.Title</td>
+            <td>@(_notifiers.SingleOrDefault(n=>n.GetType().FullName == item.NotifierType)?.GetType().GetDisplayName() ?? "NÃO ENCONTRADO!")</td>
+            <td>@item.Delay.ToString(InputTimeSpan.DefaultFormat)</td>
+            <td>
+                <div class="btn btn-group">
+                    <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>
+                    <button class="btn btn-danger btn-sm" @onclick="()=>DeleteAsync(item)"><span class="oi oi-trash"></span></button>
+                </div>
+            </td>
+        </Row>
+    </TList>
+</LoadableList>
+
+@code {
+    private List<NotifierModel> _list;
+
+    [Parameter]
+    public EventCallback<int> OnEdit { get; set; }
+
+    protected override Task OnInitializedAsync() =>
+        UpdateAsync();
+
+    public async Task UpdateAsync()
+    {
+        _list = null;
+        StateHasChanged();
+        _list = await _context.NFNotifiers
+            .Active()
+            .ProjectTo<NotifierModel>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+        StateHasChanged();
+    }
+
+    public async Task DeleteAsync(NotifierModel item)
+    {
+        if (!await _js.InvokeAsync<bool>("confirm", "Tem certeza que deseja excluir esse notificador?"))
+            return;
+        var onDb = await _context.NFNotifiers
+            .Active()
+            .OfId(item.Id)
+            .SingleAsync();
+        onDb.Delete();
+        await _context.SaveChangesAsync();
+        _list.Remove(item);
+    }
+}

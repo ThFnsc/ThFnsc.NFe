@@ -1,5 +1,6 @@
 ﻿using PuppeteerSharp;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using ThFnsc.NFe.Data.Entities;
 
 namespace ThFnsc.NFe.Infra.Services.ContaJa
 {
+    [Display(Name = "ContaJá")]
     public class ContaJaNFeNotifier : INFNotifier
     {
         private readonly IChromePathFinder _chromePathFinder;

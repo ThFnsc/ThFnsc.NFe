@@ -41,7 +41,7 @@ namespace ThFnsc.NFe.Infra.Applications
                 .SingleAsync();
 
             var nfe = await _nfe.IssueNFeAsync(sg.Provider.Id, sg.ToDocument.Id, sg.Value, sg.ServiceId, sg.ServiceDescription, sg.AliquotPercentage);
-            
+
             if (!nfe.Success.Value)
                 throw new Exception(nfe.ErrorMessage);
 

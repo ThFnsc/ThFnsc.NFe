@@ -3,6 +3,7 @@ using ThFnsc.NFe.Data.Entities;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.NFe;
+using ThFnsc.NFe.Models.Notifier;
 using ThFnsc.NFe.Models.Provider;
 using ThFnsc.NFe.Models.ScheduledGeneration;
 using ThFnsc.NFe.Models.SMTP;
@@ -19,6 +20,13 @@ namespace ThFnsc.NFe
             AddressMappings();
             ProviderMappings();
             ScheduledGenerationMappings();
+            NotifierMappings();
+        }
+
+        private void NotifierMappings()
+        {
+            CreateMap<NFNotifier, NotifierModel>();
+            CreateMap<NFNotifier, EditNotifierModel>();
         }
 
         private void NFMappings()
