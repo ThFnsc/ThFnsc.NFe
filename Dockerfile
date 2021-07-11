@@ -36,10 +36,19 @@ RUN apt-get install -y dotnet-sdk-$DOTNET_VERSION
 #Copy files for restore
 WORKDIR /src
 COPY ThFnsc.NFe.sln .
-COPY src/ThFnsc.NFe/ThFnsc.NFe.csproj src/ThFnsc.NFe/
-COPY src/ThFnsc.NFe.Core/ThFnsc.NFe.Core.csproj src/ThFnsc.NFe.Core/
-COPY src/ThFnsc.NFe.Data/ThFnsc.NFe.Data.csproj src/ThFnsc.NFe.Data/
+
 COPY src/ThFnsc.NFe.Infra/ThFnsc.NFe.Infra.csproj src/ThFnsc.NFe.Infra/
+COPY src/ThFnsc.NFe.Core/ThFnsc.NFe.Core.csproj   src/ThFnsc.NFe.Core/
+COPY src/ThFnsc.NFe.Data/ThFnsc.NFe.Data.csproj   src/ThFnsc.NFe.Data/
+COPY src/ThFnsc.NFe/ThFnsc.NFe.csproj             src/ThFnsc.NFe/
+
+COPY src/services/ThFnsc.NFe.Services.RazorEngineRenderer/ThFnsc.NFe.Services.RazorEngineRenderer.csproj src/services/ThFnsc.NFe.Services.RazorEngineRenderer/
+COPY src/services/ThFnsc.NFe.Services.PuppeteerHTMLToPDF/ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj   src/services/ThFnsc.NFe.Services.PuppeteerHTMLToPDF/
+COPY src/services/ThFnsc.NFe.Services.ChromeUtilities/ThFnsc.NFe.Services.ChromeUtilities.csproj         src/services/ThFnsc.NFe.Services.ChromeUtilities/
+COPY src/services/ThFnsc.NFe.Services.ContaJa/ThFnsc.NFe.Services.ContaJa.csproj                         src/services/ThFnsc.NFe.Services.ContaJa/
+COPY src/services/ThFnsc.NFe.Services.IPMNF/ThFnsc.NFe.Services.IPMNF.csproj                             src/services/ThFnsc.NFe.Services.IPMNF/
+COPY src/services/ThFnsc.NFe.Services.SMTP/ThFnsc.NFe.Services.SMTP.csproj                               src/services/ThFnsc.NFe.Services.SMTP/
+
 COPY tests/ThFnsc.NFe.Tests/ThFnsc.NFe.Tests.csproj tests/ThFnsc.NFe.Tests/
 
 #Restore
