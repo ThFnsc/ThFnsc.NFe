@@ -1,8 +1,10 @@
-﻿@inject NFContext _context
+﻿@using ThFnsc.NFe.Core.Services
+@using ThFnsc.NFe.Models.ScheduledGeneration
+
+@inject NFContext _context
 @inject IMapper _mapper
 @inject ScheduledGenerationAppService _sgApp
-
-@using ThFnsc.NFe.Models.ScheduledGeneration
+@inject IEnumerable<INFNotifier> _notifierServices
 
 @if (_model is null)
 {
@@ -23,9 +25,9 @@ else
             <InputSelect @bind-Value="_model.ProviderId" class="form-control">
                 <option value="">Selecionar</option>
                 @foreach (var doc in _providers)
-                {
+                    {
                     <option value="@doc.Key">@doc.Value</option>
-                }
+                    }
             </InputSelect>
             <ValidationMessage For="()=>_model.ProviderId" />
         </div>
@@ -35,9 +37,9 @@ else
             <InputSelect @bind-Value="_model.ToDocumentId" class="form-control">
                 <option value="">Selecionar</option>
                 @foreach (var doc in _documents)
-                {
+                    {
                     <option value="@doc.Key">@doc.Value</option>
-                }
+                    }
             </InputSelect>
             <ValidationMessage For="()=>_model.ToDocumentId" />
         </div>
@@ -77,6 +79,28 @@ else
         </div>
 
         <div class="col-12">
+            <Accordion>
+                <Heading>
+                    <Name For="() => _model.NotifierIDs" />
+                </Heading>
+                <Content>
+                    @foreach (var notifier in _notifiers)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" 
+                                   checked="@_model.NotifierIDs.Contains(notifier.Key)" 
+                                   @onchange="evt=> { if ((bool) evt.Value) _model.NotifierIDs.Add(notifier.Key); else _model.NotifierIDs.Remove(notifier.Key); }" 
+                                   type="checkbox" 
+                                   id="notifier-@notifier.Key">
+                            <label class="form-check-label" for="notifier-@notifier.Key">@notifier.Value</label>
+                        </div>
+                    }
+                </Content>
+            </Accordion>
+            <ValidationMessage For="()=>_model.NotifierIDs" />
+        </div>
+
+        <div class="col-12">
             <div class="btn-group">
                 <UpdateSchedulesButton />
                 @if (_model.Id == 0)
@@ -99,6 +123,7 @@ else
     private bool _processing;
     private IDictionary<int, string> _providers;
     private IDictionary<int, string> _documents;
+    private IDictionary<int, string> _notifiers;
 
     [Parameter]
     public EventCallback<ScheduledGenerationModel> OnUpdate { get; set; }
@@ -107,11 +132,20 @@ else
     {
         _documents = await _context.Documents
             .Active()
+            .Select(d=>new { d.Id, d.Name})
             .ToDictionaryAsync(d => d.Id, d => d.Name);
 
         _providers = await _context.Providers
             .Active()
-            .ToDictionaryAsync(d => d.Id, d => d.Issuer.Name);
+            .Select(d => new { d.Id, IssuerName = d.Issuer.Name })
+            .ToDictionaryAsync(d => d.Id, d => d.IssuerName);
+
+        _notifiers = await _context.NFNotifiers
+            .Active()
+            .OrderBy(n=>n.NotifierType)
+                .ThenBy(n=>n.Title)
+            .Select(n => new { n.Id, n.Title, n.NotifierType })
+            .ToDictionaryAsync(n => n.Id, n => $"({_notifierServices.SingleOrDefault(s => s.GetType().FullName == n.NotifierType)?.GetType().GetDisplayName() ?? "INVÁLIDO"}) {n.Title}");
 
         _model = await _context.NFes
             .Active()
@@ -133,8 +167,9 @@ else
         _editing = await _context.ScheduledGenerations
             .Active()
             .OfId(id)
-            .Include(s=>s.Provider)
-            .Include(s=>s.ToDocument)
+            .Include(s => s.Provider)
+            .Include(s => s.ToDocument)
+            .Include(s => s.Notifiers)
             .SingleAsync();
         _model = _mapper.Map<EditScheduledGenerationModel>(_editing);
         _processing = false;
@@ -153,7 +188,8 @@ else
                 _model.AliquotPercentage,
                 _model.ServiceId,
                 _model.ServiceDescription,
-                true);
+                true,
+                _model.NotifierIDs);
         else
             await _sgApp.UpdateAsync(
                 _model.Id,
@@ -164,7 +200,8 @@ else
                 _model.AliquotPercentage,
                 _model.ServiceId,
                 _model.ServiceDescription,
-                true);
+                _model.Enabled,
+                _model.NotifierIDs);
 
         _model = new();
         await OnUpdate.InvokeAsync();

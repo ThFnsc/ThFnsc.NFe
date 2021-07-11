@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
@@ -94,10 +95,12 @@ namespace ThFnsc.NFe.Infra.Applications
             float aliquotPercentage,
             int serviceId,
             string serviceDescription,
-            bool enabled)
+            bool enabled,
+            IEnumerable<int> notifiers)
         {
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
+            var notifiersOnDb = await _context.NFNotifiers.Where(n => notifiers.Contains(n.Id)).ToListAsync();
 
             var scheduledGeneration = new ScheduledGeneration(
                 cronPattern,
@@ -108,6 +111,9 @@ namespace ThFnsc.NFe.Infra.Applications
                 serviceId,
                 serviceDescription,
                 enabled);
+
+            foreach (var notifier in notifiersOnDb)
+                scheduledGeneration.Notifiers.Add(notifier);
 
             _context.Add(scheduledGeneration);
             await _context.SaveChangesAsync();
@@ -124,11 +130,13 @@ namespace ThFnsc.NFe.Infra.Applications
             float aliquotPercentage,
             int serviceId,
             string serviceDescription,
-            bool enabled)
+            bool enabled,
+            IEnumerable<int> notifiers)
         {
-            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).SingleAsync();
+            var scheduledGeneration = await _context.ScheduledGenerations.Active().OfId(id).Include(s=>s.Notifiers).SingleAsync();
             var toDoc = await _context.Documents.Active().OfId(toDocumentId).SingleAsync();
             var provider = await _context.Providers.Active().OfId(providerId).SingleAsync();
+            var notifiersOnDb = await _context.NFNotifiers.Active().Where(n => notifiers.Contains(n.Id)).ToListAsync();
 
             scheduledGeneration.Update(
                 cronPattern,
@@ -139,6 +147,10 @@ namespace ThFnsc.NFe.Infra.Applications
                 serviceId,
                 serviceDescription,
                 enabled);
+
+            scheduledGeneration.Notifiers.Clear();
+            foreach (var notifier in notifiersOnDb)
+                scheduledGeneration.Notifiers.Add(notifier);
 
             await _context.SaveChangesAsync();
             UpdateRecurringJob(scheduledGeneration);

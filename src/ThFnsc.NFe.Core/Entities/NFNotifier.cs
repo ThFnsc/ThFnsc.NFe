@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ThFnsc.NFe.Core.Entities.Shared;
 
 namespace ThFnsc.NFe.Core.Entities
@@ -12,6 +13,8 @@ namespace ThFnsc.NFe.Core.Entities
         public string JsonData { get; private set; }
 
         public TimeSpan Delay { get; private set; }
+
+        public ICollection<ScheduledGeneration> ScheduledGenerations { get; private set; }
 
         public NFNotifier(string title, string notifierType, string jsonData, TimeSpan delay) =>
             Update(title, notifierType, jsonData, delay);

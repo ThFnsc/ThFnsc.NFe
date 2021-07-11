@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ThFnsc.NFe.Models.ScheduledGeneration
 {
@@ -37,5 +38,8 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
 
         [Display(Name = "Habilitado")]
         public bool Enabled { get; set; }
+
+        [Display(Name = "Notificadores")]
+        public List<int> NotifierIDs { get; set; } = new();
     }
 }

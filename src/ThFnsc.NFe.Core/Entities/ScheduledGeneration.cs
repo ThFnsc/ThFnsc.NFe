@@ -24,7 +24,7 @@ namespace ThFnsc.NFe.Core.Entities
 
         public bool Enabled { get; private set; }
 
-        public ICollection<NFNotifier> Notifiers { get; private set; }
+        public ICollection<NFNotifier> Notifiers { get; private set; } = new List<NFNotifier>();
 
         public ScheduledGeneration(
             string cronPattern,

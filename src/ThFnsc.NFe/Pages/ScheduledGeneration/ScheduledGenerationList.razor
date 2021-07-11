@@ -1,13 +1,17 @@
-﻿@inject NFContext _context
+﻿@using ThFnsc.NFe.Models.ScheduledGeneration
+@using ThFnsc.NFe.Core.Services
+
+@inject NFContext _context
 @inject IMapper _mapper
 @inject IJSRuntime _js
 @inject ScheduledGenerationAppService _sgApp
-@using ThFnsc.NFe.Models.ScheduledGeneration
+@inject IEnumerable<INFNotifier> _notifierServices
 
 <LoadableList Items="_list">
     <TList Items="_list">
         <TableHeader>
             <td>CRON</td>
+            <td>Notificadores</td>
             <td>Prestador</td>
             <td>Tomador</td>
             <td>Valor</td>
@@ -18,6 +22,12 @@
         </TableHeader>
         <Row Context="item">
             <td>@item.CronPattern</td>
+            <td>
+                @foreach (var notifier in item.Notifiers)
+                {
+                    <div>(@(_notifierServices.SingleOrDefault(s=>s.GetType().FullName == notifier.NotifierType)?.GetType().GetDisplayName() ?? "INVÁLIDO")) @notifier.Title</div>
+                }
+            </td>
             <td>@item.Provider.Issuer.Name</td>
             <td>@item.ToDocument.Name</td>
             <td>R$@item.Value</td>
@@ -57,7 +67,7 @@
 
     public async Task ToggleEnableAsync(ScheduledGenerationModel sg)
     {
-        var onDb= await _sgApp.ToggleEnableAsync(sg.Id);
+        var onDb = await _sgApp.ToggleEnableAsync(sg.Id);
         sg.Enabled = onDb.Enabled;
     }
 

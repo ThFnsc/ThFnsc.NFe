@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Linq;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.Document;
@@ -41,6 +42,7 @@ namespace ThFnsc.NFe
                 .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.DocumentTo.Id));
 
             CreateMap<ScheduledGeneration, EditScheduledGenerationModel>()
+                .ForMember(m => m.NotifierIDs, res => res.MapFrom(m => m.Notifiers.Select(n=>n.Id)))
                 .ForMember(m => m.ProviderId, res => res.MapFrom(m => m.Provider.Id))
                 .ForMember(m => m.ToDocumentId, res => res.MapFrom(m => m.ToDocument.Id));
         }

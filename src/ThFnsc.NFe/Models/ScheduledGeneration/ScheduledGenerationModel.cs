@@ -1,4 +1,6 @@
-﻿using ThFnsc.NFe.Models.Document;
+﻿using System.Collections.Generic;
+using ThFnsc.NFe.Models.Document;
+using ThFnsc.NFe.Models.Notifier;
 using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe.Models.ScheduledGeneration
@@ -22,5 +24,7 @@ namespace ThFnsc.NFe.Models.ScheduledGeneration
         public string ServiceDescription { get; set; }
 
         public bool Enabled { get; set; }
+
+        public List<NotifierModel> Notifiers { get; set; }
     }
 }
