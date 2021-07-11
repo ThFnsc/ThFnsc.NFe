@@ -25,6 +25,19 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get update
 RUN apt-get install -y google-chrome-stable
 
+#~~~~~~~~~~~~~~~~~~~~~~~~ restore files extraction stage ~~~~~~~~~~~~~~~~~~~~~~~~#
+FROM $DISTRO:$DISTRO_VERSION AS restore
+WORKDIR src
+
+#Copy all project files
+COPY . .
+
+#Make a tarball with only the .csproj and .sln files
+RUN find . \( -name *.csproj -or -name *.sln \) -print0 | tar -cvf restore.tar --null -T -
+
+#Extract the tarball into /restore
+RUN mkdir /restore
+RUN tar -xvf restore.tar -C /restore
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ build stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM base AS build
@@ -35,21 +48,9 @@ RUN apt-get install -y dotnet-sdk-$DOTNET_VERSION
 
 #Copy files for restore
 WORKDIR /src
-COPY ThFnsc.NFe.sln .
 
-COPY src/ThFnsc.NFe.Infra/ThFnsc.NFe.Infra.csproj src/ThFnsc.NFe.Infra/
-COPY src/ThFnsc.NFe.Core/ThFnsc.NFe.Core.csproj   src/ThFnsc.NFe.Core/
-COPY src/ThFnsc.NFe.Data/ThFnsc.NFe.Data.csproj   src/ThFnsc.NFe.Data/
-COPY src/ThFnsc.NFe/ThFnsc.NFe.csproj             src/ThFnsc.NFe/
-
-COPY src/services/ThFnsc.NFe.Services.RazorEngineRenderer/ThFnsc.NFe.Services.RazorEngineRenderer.csproj src/services/ThFnsc.NFe.Services.RazorEngineRenderer/
-COPY src/services/ThFnsc.NFe.Services.PuppeteerHTMLToPDF/ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj   src/services/ThFnsc.NFe.Services.PuppeteerHTMLToPDF/
-COPY src/services/ThFnsc.NFe.Services.ChromeUtilities/ThFnsc.NFe.Services.ChromeUtilities.csproj         src/services/ThFnsc.NFe.Services.ChromeUtilities/
-COPY src/services/ThFnsc.NFe.Services.ContaJa/ThFnsc.NFe.Services.ContaJa.csproj                         src/services/ThFnsc.NFe.Services.ContaJa/
-COPY src/services/ThFnsc.NFe.Services.IPMNF/ThFnsc.NFe.Services.IPMNF.csproj                             src/services/ThFnsc.NFe.Services.IPMNF/
-COPY src/services/ThFnsc.NFe.Services.SMTP/ThFnsc.NFe.Services.SMTP.csproj                               src/services/ThFnsc.NFe.Services.SMTP/
-
-COPY tests/ThFnsc.NFe.Tests/ThFnsc.NFe.Tests.csproj tests/ThFnsc.NFe.Tests/
+#Copy only the .csproj and .sln files
+COPY --from=restore /restore ./
 
 #Restore
 RUN dotnet restore
