@@ -10,10 +10,6 @@ namespace ThFnsc.NFe.Models.Provider
         [Required]
         public int? DocumentId { get; set; }
 
-        [Required]
-        [Display(Name = "SMTP")]
-        public int? SMTPId { get; set; }
-
         [Display(Name = "Dados")]
         public string Data { get; set; }
 

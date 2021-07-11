@@ -11,13 +11,11 @@
         <TableHeader>
             <td>Documento</td>
             <td>Prefeitura</td>
-            <td>SMTP</td>
             <td>Ações</td>
         </TableHeader>
         <Row Context="item">
             <td>@item.Issuer.DocIdentifier @item.Issuer.Name</td>
             <td>@(_clients.SingleOrDefault(n=>n.GetType().FullName == item.TownHallType)?.GetType().GetDisplayName() ?? "NÃO ENCONTRADA!")</td>
-            <td>@item.SMTP.Account</td>
             <td>
                 <div class="btn btn-group">
                     <button class="btn btn-primary btn-sm" @onclick="()=>OnEdit.InvokeAsync(item.Id)"><span class="oi oi-pencil"></span></button>

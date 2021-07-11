@@ -12,37 +12,37 @@ else
 {
     <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
         <DataAnnotationsValidator />
-        <div class="col-lg-4">
+        <div class="col-lg-2">
             <LabelFor For="() => _model.CronPattern" />
             <InputText @bind-Value="_model.CronPattern" placeholder="0 10 1 * *" class="form-control" />
             <ValidationMessage For="()=>_model.CronPattern" />
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <LabelFor For="() => _model.ProviderId" />
             <InputSelect @bind-Value="_model.ProviderId" class="form-control">
                 <option value="">Selecionar</option>
                 @foreach (var doc in _providers)
-                    {
+                {
                     <option value="@doc.Key">@doc.Value</option>
-                    }
+                }
             </InputSelect>
             <ValidationMessage For="()=>_model.ProviderId" />
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <LabelFor For="() => _model.ToDocumentId" />
             <InputSelect @bind-Value="_model.ToDocumentId" class="form-control">
                 <option value="">Selecionar</option>
                 @foreach (var doc in _documents)
-                    {
+                {
                     <option value="@doc.Key">@doc.Value</option>
-                    }
+                }
             </InputSelect>
             <ValidationMessage For="()=>_model.ToDocumentId" />
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-2">
             <LabelFor For="() => _model.Value" />
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -53,13 +53,13 @@ else
             <ValidationMessage For="()=>_model.Value" />
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-2">
             <LabelFor For="() => _model.ServiceId" />
             <InputNumber @bind-Value="_model.ServiceId" class="form-control" />
             <ValidationMessage For="()=>_model.ServiceId" />
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-2">
             <LabelFor For="() => _model.AliquotPercentage" />
             <div class="input-group">
                 <InputNumber @bind-Value="_model.AliquotPercentage" class="form-control" />
@@ -70,7 +70,7 @@ else
             <ValidationMessage For="()=>_model.AliquotPercentage" />
         </div>
 
-        <div class="col-12">
+        <div class="col-6">
             <LabelFor For="() => _model.ServiceDescription" />
             <InputText @bind-Value="_model.ServiceDescription" class="form-control" />
             <ValidationMessage For="()=>_model.ServiceDescription" />
@@ -133,6 +133,8 @@ else
         _editing = await _context.ScheduledGenerations
             .Active()
             .OfId(id)
+            .Include(s=>s.Provider)
+            .Include(s=>s.ToDocument)
             .SingleAsync();
         _model = _mapper.Map<EditScheduledGenerationModel>(_editing);
         _processing = false;

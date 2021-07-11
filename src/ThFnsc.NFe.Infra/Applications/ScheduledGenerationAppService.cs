@@ -58,7 +58,6 @@ namespace ThFnsc.NFe.Infra.Applications
                 .OfId(nfId)
                 .Include(n => n.DocumentTo.Address)
                 .Include(n => n.Provider.Issuer.Address)
-                .Include(n => n.Provider.SMTP)
                 .SingleAsync();
 
             var notifier = await _context.NFNotifiers

@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using ThFnsc.NFe.Core.Entities;
-using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Models.Address;
 using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.NFe;
 using ThFnsc.NFe.Models.Notifier;
 using ThFnsc.NFe.Models.Provider;
 using ThFnsc.NFe.Models.ScheduledGeneration;
-using ThFnsc.NFe.Models.SMTP;
 
 namespace ThFnsc.NFe
 {
@@ -16,7 +14,6 @@ namespace ThFnsc.NFe
         public MappingProfile()
         {
             NFMappings();
-            SMTPMappings();
             DocumentMappings();
             AddressMappings();
             ProviderMappings();
@@ -52,7 +49,6 @@ namespace ThFnsc.NFe
         {
             CreateMap<Provider, ProviderModel>();
             CreateMap<Provider, EditProviderModel>()
-                .ForMember(m => m.SMTPId, res => res.MapFrom(m => m.SMTP.Id))
                 .ForMember(m => m.DocumentId, res => res.MapFrom(m => m.Issuer.Id));
         }
 
@@ -66,12 +62,6 @@ namespace ThFnsc.NFe
         {
             CreateMap<Document, DocumentModel>();
             CreateMap<Document, EditDocumentModel>();
-        }
-
-        private void SMTPMappings()
-        {
-            CreateMap<SMTP, EditSMTPModel>();
-            CreateMap<SMTP, SMTPModel>();
         }
     }
 }

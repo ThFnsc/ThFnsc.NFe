@@ -9,12 +9,11 @@
     <TList Items="_list">
         <TableHeader>
             <td>Título</td>
-            <td>Tipo</td>
             <td>Delay</td>
+            <td>Opções</td>
         </TableHeader>
         <Row Context="item">
-            <td>@item.Title</td>
-            <td>@(_notifiers.SingleOrDefault(n=>n.GetType().FullName == item.NotifierType)?.GetType().GetDisplayName() ?? "NÃO ENCONTRADO!")</td>
+            <td>(@(_notifiers.SingleOrDefault(n=>n.GetType().FullName == item.NotifierType)?.GetType().GetDisplayName() ?? "NÃO ENCONTRADO!")) @item.Title</td>
             <td>@item.Delay.ToString(InputTimeSpan.DefaultFormat)</td>
             <td>
                 <div class="btn btn-group">

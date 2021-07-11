@@ -11,8 +11,6 @@ namespace ThFnsc.NFe.Data.Context
 
         public DbSet<Address> Addresses { get; private set; }
 
-        public DbSet<SMTP> SMTPs { get; private set; }
-
         public DbSet<Provider> Providers { get; private set; }
 
         public DbSet<ScheduledGeneration> ScheduledGenerations { get; private set; }

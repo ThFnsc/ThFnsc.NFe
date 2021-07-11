@@ -5,10 +5,9 @@
 
 @inject NFContext _context
 @inject IMapper _mapper
-@inject SMTPAppService _smtp
 @inject IEnumerable<ITownHallApiClient> _apiClients
 
-@if (_model is null || _documents is null || _smtps is null)
+@if (_model is null || _documents is null)
 {
     <Loader />
 }
@@ -16,7 +15,7 @@ else
 {
     <EditForm Model="_model" OnValidSubmit="SaveAsync" class="row g-3">
         <DataAnnotationsValidator />
-        <div class="col-lg-4">
+        <div class="col-lg-6">
             <LabelFor For="() => _model.DocumentId" />
             <InputSelect @bind-Value="_model.DocumentId" class="form-control">
                 <option value="">Selecionar</option>
@@ -28,19 +27,7 @@ else
             <ValidationMessage For="()=>_model.DocumentId" />
         </div>
 
-        <div class="col-lg-4">
-            <LabelFor For="() => _model.SMTPId" />
-            <InputSelect @bind-Value="_model.SMTPId" class="form-control">
-                <option value="">Selecionar</option>
-                @foreach (var item in _smtps)
-                    {
-                    <option value="@item.Key">@item.Value</option>
-                    }
-            </InputSelect>
-            <ValidationMessage For="()=>_model.SMTPId" />
-        </div>
-
-        <div class="col-lg-4">
+        <div class="col-lg-6">
             <LabelFor For="() => _model.TownHallType" />
             <InputSelect @bind-Value="_model.TownHallType" class="form-control">
                 <option value="">Selecionar</option>
@@ -85,7 +72,6 @@ else
     private Provider _editing;
     private bool _processing;
     private IDictionary<int, string> _documents;
-    private IDictionary<int, string> _smtps;
 
     private Dictionary<string, (ITownHallApiClient client, string title)> _townHalls;
 
@@ -95,10 +81,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         _townHalls= _apiClients.ToDictionary(n => n.GetType().FullName, n => (n, n.GetType().GetDisplayName()));
-
-        _smtps = await _context.SMTPs
-        .Active()
-        .ToDictionaryAsync(d => d.Id, d => d.Account);
 
         _documents = await _context.Documents
             .Active()
@@ -113,7 +95,6 @@ else
         _editing = await _context.Providers
             .Active()
             .OfId(id)
-            .Include(d => d.SMTP)
             .Include(d => d.Issuer)
             .SingleAsync();
         _model = _mapper.Map<EditProviderModel>(_editing);
@@ -127,8 +108,7 @@ else
         {
             _processing = true;
             var issuer = await _context.Documents.Active().OfId(_model.DocumentId.Value).SingleAsync();
-            var smtp = await _context.SMTPs.Active().OfId(_model.SMTPId.Value).SingleAsync();
-            var provider = new Provider(issuer, smtp, _model.Data, _model.TownHallType);
+            var provider = new Provider(issuer, _model.Data, _model.TownHallType);
             _context.Add(provider);
             await _context.SaveChangesAsync();
             _model = new();

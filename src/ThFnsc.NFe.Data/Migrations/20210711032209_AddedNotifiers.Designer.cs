@@ -9,7 +9,7 @@ using ThFnsc.NFe.Data.Context;
 namespace ThFnsc.NFe.Data.Migrations
 {
     [DbContext(typeof(NFContext))]
-    [Migration("20210710230506_AddedNotifiers")]
+    [Migration("20210711032209_AddedNotifiers")]
     partial class AddedNotifiers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,9 +243,6 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Property<int?>("IssuerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SMTPId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TownHallType")
                         .HasColumnType("text");
 
@@ -257,51 +254,7 @@ namespace ThFnsc.NFe.Data.Migrations
 
                     b.HasIndex("IssuerId");
 
-                    b.HasIndex("SMTPId");
-
                     b.ToTable("Providers");
-                });
-
-            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.SMTP", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Account")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AccountName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp");
-
-                    b.Property<string>("Host")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Port")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("UseEncryption")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("DeletedAt");
-
-                    b.ToTable("SMTPs");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
@@ -392,13 +345,7 @@ namespace ThFnsc.NFe.Data.Migrations
                         .WithMany()
                         .HasForeignKey("IssuerId");
 
-                    b.HasOne("ThFnsc.NFe.Core.Entities.SMTP", "SMTP")
-                        .WithMany()
-                        .HasForeignKey("SMTPId");
-
                     b.Navigation("Issuer");
-
-                    b.Navigation("SMTP");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
