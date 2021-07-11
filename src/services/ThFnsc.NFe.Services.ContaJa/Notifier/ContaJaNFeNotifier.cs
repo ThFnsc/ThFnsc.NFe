@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Core.Entities;
+using ThFnsc.NFe.Core.Services;
 
 namespace ThFnsc.NFe.Services.ContaJa.Notifier
 {

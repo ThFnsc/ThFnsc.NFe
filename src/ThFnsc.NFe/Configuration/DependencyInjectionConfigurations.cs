@@ -14,6 +14,7 @@ namespace ThFnsc.NFe.Configuration
         {
             services.AddScoped<NFeAppService>();
             services.AddScoped<ScheduledGenerationAppService>();
+            services.AddScoped<NotificationAppService>();
 
             services.AddSingleton<IHtmlToPDF, PuppeteerSharpHtmlToPDF>();
             services.AddSingleton<IRazorRenderer, RazorRenderer>();

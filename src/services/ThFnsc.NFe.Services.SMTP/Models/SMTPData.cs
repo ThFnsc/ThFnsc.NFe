@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security;
 
 namespace ThFnsc.NFe.Services.SMTP.Models
 {

@@ -1,9 +1,13 @@
 ﻿@using ThFnsc.NFe.Models.NFe
+@using ThFnsc.NFe.Core.Services
+
 @inject NFContext _context
 @inject NavigationManager _navManager
 @inject IMapper _mapper
 @inject NFeAppService _nfe
 @inject IJSRuntime _js
+@inject IEnumerable<INFNotifier> _notifiers
+@inject NotificationAppService _notification
 
 <Alert @ref="_alert"/>
 
@@ -49,9 +53,9 @@ else
                         <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
                             <span class="oi oi-code"></span>
                         </button>
-                        @*<button class="btn btn-success btn-sm" title="Enviar por e-mail" @onclick='() => MailAsync(nf)'>
-            <span class="oi oi-envelope-closed"></span>
-        </button>*@
+                        <button class="btn btn-success btn-sm" title="Notificar" @onclick='() => NotifyAsync(nf)'>
+                            <span class="oi oi-bell"></span>
+                        </button>
                         @if (nf.Success is null || !nf.Success.Value)
                             {
                             <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
@@ -89,44 +93,38 @@ else
         _nfes.Remove(nfe);
     }
 
-    /*private async Task MailAsync(NFModel nfe)
+    private async Task NotifyAsync(NFModel nfe)
     {
-        var schedule = await _context.ScheduledGenerations
+        var notifiers = await _context.NFNotifiers
             .Active()
-            .Where(s => s.Provider.Id == nfe.Provider.Id)
-            .Select(a => new
+            .Select(n => new
             {
-                a.MailList,
-                TemplateId = a.MailTemplate.Id
+                n.Id,
+                n.Title,
+                n.NotifierType
             })
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
-        var addresses = await _js.InvokeAsync<string>("prompt", "Se quiser enviar essa nota para mais endereços de e-mail, escreva-os separados por vírgula", schedule?.MailList ?? string.Empty);
+        var names = _notifiers
+            .ToDictionary(n => n.GetType().FullName, n => n.GetType().GetDisplayName());
 
-        var templates = await _context.MailTemplates
-            .Active()
-            .ToDictionaryAsync(t => t.Id, t => t.Name);
+        string notifierIndex = await _js.InvokeAsync<string>(
+            "prompt",
+            $"Selecione o notificador que deseja usar:\n{string.Join('\n', notifiers.Select((t, i) => $"  {i} => ({(names.TryGetValue(t.NotifierType, out string name) ? name : "INVÁLIDO")}) {t.Title}"))}");
 
-        string templateId = await _js.InvokeAsync<string>("prompt", $"Selecione o template que deseja usar:\n{string.Join('\n', templates.Select(t => $"  {t.Key} => {t.Value}"))}", schedule?.TemplateId ?? templates.FirstOrDefault().Key);
-
-        if (!int.TryParse(templateId, out var templateIdInt) || !templates.ContainsKey(templateIdInt))
+        if (!(int.TryParse(notifierIndex, out var notifierIndexInt) && notifierIndexInt >= 0 && notifierIndexInt < notifiers.Count))
         {
-            await _js.InvokeVoidAsync("alert", "Id inválido. Cancelado");
+            await _js.InvokeVoidAsync("alert", "Índice inválido. Cancelado");
             return;
         }
 
-        var addressesList = new[] { nfe.Provider.SMTP.Account }.Concat(addresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-
-        if (!await _js.InvokeAsync<bool>("confirm", $"Enviar e-mail da nota de série {nfe.Series} para os usuários {string.Join(", ", addressesList)} usando o template '{templates[templateIdInt]}'. É isso mesmo?"))
-            return;
-
         try
         {
-            await _nfe.MailToAsync(nfe.Id, templateIdInt, addressesList);
-            _alert.Show(Alert.AlertTypes.Success, "Mensagens enviadas com sucesso!", null, TimeSpan.FromSeconds(5));
+            await _notification.NotifyAsync(nfe.Id, notifiers[notifierIndexInt].Id);
+            _alert.Show(Alert.AlertTypes.Success, "Notificado com sucesso!", null, TimeSpan.FromSeconds(5));
         } catch (Exception e)
         {
             _alert.Show(Alert.AlertTypes.Danger, e.Message, "Não foi possível enviar", TimeSpan.FromSeconds(15));
         }
-    }*/
+    }
 }

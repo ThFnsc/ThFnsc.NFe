@@ -1,13 +1,10 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
-using ThFnsc.NFe.Core.Services;
-using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Core.Entities;
+using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Repositories;
 
 namespace ThFnsc.NFe.Infra.Applications
@@ -17,16 +14,13 @@ namespace ThFnsc.NFe.Infra.Applications
     {
         private readonly NFContext _context;
         private readonly NFeAppService _nfe;
-        private readonly IEnumerable<INFNotifier> _nfNotifiers;
 
         public ScheduledGenerationAppService(
             NFContext context,
-            NFeAppService nfe,
-            IEnumerable<INFNotifier> nfNotifiers)
+            NFeAppService nfe)
         {
             _context = context;
             _nfe = nfe;
-            _nfNotifiers = nfNotifiers;
         }
 
         public async Task<IssuedNFe> ExecuteSchedule(int id)
@@ -46,38 +40,12 @@ namespace ThFnsc.NFe.Infra.Applications
                 throw new Exception(nfe.ErrorMessage);
 
             foreach (var notifier in sg.Notifiers)
-                BackgroundJob.Schedule(() => NotifyAsync(nfe.Id, notifier.Id), notifier.Delay);
+                BackgroundJob.Schedule<NotificationAppService>(nas => nas.NotifyAsync(nfe.Id, notifier.Id), notifier.Delay);
 
             return nfe;
         }
 
-        public async Task NotifyAsync(int nfId, int notifierId)
-        {
-            var nf = await _context.NFes
-                .Active()
-                .OfId(nfId)
-                .Include(n => n.DocumentTo.Address)
-                .Include(n => n.Provider.Issuer.Address)
-                .SingleAsync();
 
-            var notifier = await _context.NFNotifiers
-                .Active()
-                .OfId(notifierId)
-                .SingleAsync();
-
-            var notifierService = _nfNotifiers
-                .Single(n => n.GetType().FullName == notifier.NotifierType);
-
-            await notifierService.NotifyAsync(
-                data: JsonSerializer.Deserialize(
-                    json: notifier.JsonData,
-                    returnType: notifierService.DataType,
-                    options: new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }),
-                nfe: nf);
-        }
 
         public async Task<ScheduledGeneration> ToggleEnableAsync(int id)
         {

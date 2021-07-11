@@ -1,16 +1,16 @@
 ﻿using FluentEmail.Core;
 using FluentEmail.Smtp;
 using System;
-using System.Net.Mail;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Services.SMTP.Models;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
 
 namespace ThFnsc.NFe.Services.SMTP
 {

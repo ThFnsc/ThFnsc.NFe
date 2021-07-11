@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
-using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Services.IPMNF.Models;
 
 namespace ThFnsc.NFe.Services.IPMNF
