@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
-using System;
 
 namespace ThFnsc.NFe.Data.Migrations
 {
@@ -30,24 +30,21 @@ namespace ThFnsc.NFe.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SMTPs",
+                name: "NFNotifiers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Host = table.Column<string>(type: "text", nullable: true),
-                    Port = table.Column<short>(type: "smallint unsigned", nullable: false),
-                    UseEncryption = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Account = table.Column<string>(type: "text", nullable: true),
-                    Username = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "text", nullable: true),
-                    AccountName = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "text", nullable: true),
+                    NotifierType = table.Column<string>(type: "text", nullable: true),
+                    JsonData = table.Column<string>(type: "text", nullable: true),
+                    Delay = table.Column<TimeSpan>(type: "time", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SMTPs", x => x.Id);
+                    table.PrimaryKey("PK_NFNotifiers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -82,7 +79,6 @@ namespace ThFnsc.NFe.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     IssuerId = table.Column<int>(type: "int", nullable: true),
-                    SMTPId = table.Column<int>(type: "int", nullable: true),
                     Data = table.Column<string>(type: "text", nullable: true),
                     TownHallType = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
@@ -95,12 +91,6 @@ namespace ThFnsc.NFe.Data.Migrations
                         name: "FK_Providers_Documents_IssuerId",
                         column: x => x.IssuerId,
                         principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Providers_SMTPs_SMTPId",
-                        column: x => x.SMTPId,
-                        principalTable: "SMTPs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -116,6 +106,8 @@ namespace ThFnsc.NFe.Data.Migrations
                     VerificationCode = table.Column<string>(type: "varchar(767)", nullable: true),
                     IssuedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
                     ReturnedContent = table.Column<string>(type: "text", nullable: true),
+                    ReturnedXMLContent = table.Column<string>(type: "text", nullable: true),
+                    ReturnedPDF = table.Column<byte[]>(type: "MEDIUMBLOB", nullable: true),
                     SentContent = table.Column<string>(type: "text", nullable: true),
                     DocumentToId = table.Column<int>(type: "int", nullable: true),
                     Success = table.Column<bool>(type: "tinyint(1)", nullable: true),
@@ -142,6 +134,64 @@ namespace ThFnsc.NFe.Data.Migrations
                         principalTable: "Providers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScheduledGenerations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    CronPattern = table.Column<string>(type: "text", nullable: true),
+                    ProviderId = table.Column<int>(type: "int", nullable: true),
+                    ToDocumentId = table.Column<int>(type: "int", nullable: true),
+                    Value = table.Column<float>(type: "float", nullable: false),
+                    AliquotPercentage = table.Column<float>(type: "float", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    ServiceDescription = table.Column<string>(type: "text", nullable: true),
+                    Enabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScheduledGenerations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScheduledGenerations_Documents_ToDocumentId",
+                        column: x => x.ToDocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ScheduledGenerations_Providers_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Providers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NFNotifierScheduledGeneration",
+                columns: table => new
+                {
+                    NotifiersId = table.Column<int>(type: "int", nullable: false),
+                    ScheduledGenerationsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NFNotifierScheduledGeneration", x => new { x.NotifiersId, x.ScheduledGenerationsId });
+                    table.ForeignKey(
+                        name: "FK_NFNotifierScheduledGeneration_NFNotifiers_NotifiersId",
+                        column: x => x.NotifiersId,
+                        principalTable: "NFNotifiers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_NFNotifierScheduledGeneration_ScheduledGenerations_Scheduled~",
+                        column: x => x.ScheduledGenerationsId,
+                        principalTable: "ScheduledGenerations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -235,6 +285,21 @@ namespace ThFnsc.NFe.Data.Migrations
                 column: "VerificationCode");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NFNotifiers_CreatedAt",
+                table: "NFNotifiers",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NFNotifiers_DeletedAt",
+                table: "NFNotifiers",
+                column: "DeletedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NFNotifierScheduledGeneration_ScheduledGenerationsId",
+                table: "NFNotifierScheduledGeneration",
+                column: "ScheduledGenerationsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Providers_CreatedAt",
                 table: "Providers",
                 column: "CreatedAt");
@@ -250,19 +315,29 @@ namespace ThFnsc.NFe.Data.Migrations
                 column: "IssuerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Providers_SMTPId",
-                table: "Providers",
-                column: "SMTPId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SMTPs_CreatedAt",
-                table: "SMTPs",
+                name: "IX_ScheduledGenerations_CreatedAt",
+                table: "ScheduledGenerations",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SMTPs_DeletedAt",
-                table: "SMTPs",
+                name: "IX_ScheduledGenerations_DeletedAt",
+                table: "ScheduledGenerations",
                 column: "DeletedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledGenerations_Enabled",
+                table: "ScheduledGenerations",
+                column: "Enabled");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledGenerations_ProviderId",
+                table: "ScheduledGenerations",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledGenerations_ToDocumentId",
+                table: "ScheduledGenerations",
+                column: "ToDocumentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -271,13 +346,19 @@ namespace ThFnsc.NFe.Data.Migrations
                 name: "NFes");
 
             migrationBuilder.DropTable(
+                name: "NFNotifierScheduledGeneration");
+
+            migrationBuilder.DropTable(
+                name: "NFNotifiers");
+
+            migrationBuilder.DropTable(
+                name: "ScheduledGenerations");
+
+            migrationBuilder.DropTable(
                 name: "Providers");
 
             migrationBuilder.DropTable(
                 name: "Documents");
-
-            migrationBuilder.DropTable(
-                name: "SMTPs");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

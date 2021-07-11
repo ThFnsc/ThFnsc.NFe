@@ -9,8 +9,8 @@ using ThFnsc.NFe.Data.Context;
 namespace ThFnsc.NFe.Data.Migrations
 {
     [DbContext(typeof(NFContext))]
-    [Migration("20210707034538_AddedScheduling")]
-    partial class AddedScheduling
+    [Migration("20210711065056_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,6 +18,21 @@ namespace ThFnsc.NFe.Data.Migrations
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.7");
+
+            modelBuilder.Entity("NFNotifierScheduledGeneration", b =>
+                {
+                    b.Property<int>("NotifiersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduledGenerationsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NotifiersId", "ScheduledGenerationsId");
+
+                    b.HasIndex("ScheduledGenerationsId");
+
+                    b.ToTable("NFNotifierScheduledGeneration");
+                });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Address", b =>
                 {
@@ -187,25 +202,28 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.ToTable("NFes");
                 });
 
-            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.MailTemplate", b =>
+            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.NFNotifier", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Body")
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp");
+
+                    b.Property<TimeSpan>("Delay")
+                        .HasColumnType("time");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("varchar(767)");
+                    b.Property<string>("JsonData")
+                        .HasColumnType("text");
 
-                    b.Property<string>("Subject")
+                    b.Property<string>("NotifierType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -214,9 +232,7 @@ namespace ThFnsc.NFe.Data.Migrations
 
                     b.HasIndex("DeletedAt");
 
-                    b.HasIndex("Name");
-
-                    b.ToTable("MailTemplates");
+                    b.ToTable("NFNotifiers");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Provider", b =>
@@ -237,9 +253,6 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.Property<int?>("IssuerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SMTPId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TownHallType")
                         .HasColumnType("text");
 
@@ -251,51 +264,7 @@ namespace ThFnsc.NFe.Data.Migrations
 
                     b.HasIndex("IssuerId");
 
-                    b.HasIndex("SMTPId");
-
                     b.ToTable("Providers");
-                });
-
-            modelBuilder.Entity("ThFnsc.NFe.Core.Entities.SMTP", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Account")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AccountName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp");
-
-                    b.Property<string>("Host")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Port")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("UseEncryption")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("DeletedAt");
-
-                    b.ToTable("SMTPs");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
@@ -318,12 +287,6 @@ namespace ThFnsc.NFe.Data.Migrations
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("MailList")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("MailTemplateId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ProviderId")
                         .HasColumnType("int");
@@ -348,13 +311,26 @@ namespace ThFnsc.NFe.Data.Migrations
 
                     b.HasIndex("Enabled");
 
-                    b.HasIndex("MailTemplateId");
-
                     b.HasIndex("ProviderId");
 
                     b.HasIndex("ToDocumentId");
 
                     b.ToTable("ScheduledGenerations");
+                });
+
+            modelBuilder.Entity("NFNotifierScheduledGeneration", b =>
+                {
+                    b.HasOne("ThFnsc.NFe.Core.Entities.NFNotifier", null)
+                        .WithMany()
+                        .HasForeignKey("NotifiersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ThFnsc.NFe.Core.Entities.ScheduledGeneration", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduledGenerationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.Document", b =>
@@ -387,21 +363,11 @@ namespace ThFnsc.NFe.Data.Migrations
                         .WithMany()
                         .HasForeignKey("IssuerId");
 
-                    b.HasOne("ThFnsc.NFe.Core.Entities.SMTP", "SMTP")
-                        .WithMany()
-                        .HasForeignKey("SMTPId");
-
                     b.Navigation("Issuer");
-
-                    b.Navigation("SMTP");
                 });
 
             modelBuilder.Entity("ThFnsc.NFe.Core.Entities.ScheduledGeneration", b =>
                 {
-                    b.HasOne("ThFnsc.NFe.Core.Entities.MailTemplate", "MailTemplate")
-                        .WithMany()
-                        .HasForeignKey("MailTemplateId");
-
                     b.HasOne("ThFnsc.NFe.Core.Entities.Provider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId");
@@ -409,8 +375,6 @@ namespace ThFnsc.NFe.Data.Migrations
                     b.HasOne("ThFnsc.NFe.Core.Entities.Document", "ToDocument")
                         .WithMany()
                         .HasForeignKey("ToDocumentId");
-
-                    b.Navigation("MailTemplate");
 
                     b.Navigation("Provider");
 
