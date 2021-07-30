@@ -66,8 +66,8 @@ namespace ThFnsc.NFe.Services.ContaJa.Notifier
                 //Presses escape to close the datetimepicker. Otherwise the file chooser wont open later
                 await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Escape);
 
-                //Selects the option to Invoice (index 3)
-                await page.SelectAsync("select[name=\"tipo\"]", "3");
+                //Selects the option to Invoice (index 2)
+                await page.SelectAsync("select[name=\"tipo\"]", "2");
 
                 //Defines the invoice description
                 await page.TypeAsync("textarea[name=\"descricao\"]", confs.NFDescription);
