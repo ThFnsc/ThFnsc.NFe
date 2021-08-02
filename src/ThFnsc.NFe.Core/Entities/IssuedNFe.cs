@@ -52,6 +52,7 @@ namespace ThFnsc.NFe.Core.Entities
             ServiceDescription = serviceDescription ?? throw new ArgumentNullException(nameof(serviceDescription));
             Provider = provider ?? throw new ArgumentNullException(nameof(provider));
             DocumentTo = documentTo ?? throw new ArgumentNullException(nameof(documentTo));
+            IssuedAt = CreatedAt;
         }
 
         public void OnReturned(
