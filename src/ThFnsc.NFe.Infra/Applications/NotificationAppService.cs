@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -9,6 +10,7 @@ using ThFnsc.NFe.Data.Repositories;
 
 namespace ThFnsc.NFe.Infra.Applications
 {
+    [AutomaticRetry(Attempts = 0)]
     public class NotificationAppService
     {
         private readonly NFContext _context;

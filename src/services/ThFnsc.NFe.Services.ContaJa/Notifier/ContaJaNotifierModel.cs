@@ -6,7 +6,7 @@
 
         public string Password { get; set; }
 
-        public string RazorFilename { get; set; } = "NF-@Model.Series.xml";
+        public string RazorFilename { get; set; } = "NF-@(Model.Series).xml";
 
         public string NFDescription { get; set; } = "Prestação de serviços";
     }
