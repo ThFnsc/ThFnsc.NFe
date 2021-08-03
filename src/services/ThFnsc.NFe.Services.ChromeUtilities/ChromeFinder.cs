@@ -9,7 +9,8 @@ namespace ThFnsc.NFe.Infra.Services.Chrome
         private static string[] _possiblePaths = new string[]
         {
             "/usr/bin/google-chrome",
-            @"C:\Program Files\Google\Chrome\Application\chrome.exe"
+            @"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
         };
 
         private static readonly Lazy<string> _finder = new(() =>

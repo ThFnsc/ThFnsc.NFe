@@ -75,7 +75,7 @@ namespace ThFnsc.NFe.Infra.Applications
             }
             catch (Exception e)
             {
-                nf.OnReturned(false, e.Message, null, null, null, null, 0, null, DateTimeOffset.UtcNow);
+                nf.OnReturned(false, $"{e.Message}\n{e.StackTrace}", null, null, null, null, 0, null, DateTimeOffset.UtcNow);
             }
             finally
             {
