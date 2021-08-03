@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  nfe:
+    image: thiagofnsc/nfe
+    restart: always
+    environment:
+      ThFnscNFe_ConnectionStrings__Default: "server=mysql;database=ThFnscNF;user=root;password=u5H6ewY3JbVSLGpKfBf4Urx"
+    volumes: 
+      - ./keys/:/root/.aspnet/DataProtection-Keys
+    ports: 
+      - 24621:80
+    depends_on: 
+      mysql:
+        condition: service_healthy
+    networks: 
+      - db
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - "./mysql_data:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: u5H6ewY3JbVSLGpKfBf4Urx
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 1s
+      interval: 1s
+      retries: 10
+    networks:
+      - db
+
+networks:
+  db:
+    driver: bridge

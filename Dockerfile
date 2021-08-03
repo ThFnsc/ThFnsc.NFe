@@ -2,6 +2,7 @@ ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=21.04
 ARG DOTNET_VERSION=5.0
 
+
 #~~~~~~~~~~~~~~~~~~~~~~~~ base stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM $DISTRO:$DISTRO_VERSION AS base
 ARG DISTRO
@@ -25,6 +26,7 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get update
 RUN apt-get install -y google-chrome-stable
 
+
 #~~~~~~~~~~~~~~~~~~~~~~~~ restore files extraction stage ~~~~~~~~~~~~~~~~~~~~~~~~#
 FROM $DISTRO:$DISTRO_VERSION AS restore
 WORKDIR src
@@ -39,8 +41,14 @@ RUN find . \( -name *.csproj -or -name *.sln \) -print0 | tar -cvf restore.tar -
 RUN mkdir /restore
 RUN tar -xvf restore.tar -C /restore
 
+FROM base AS runtime
+#Install aspnet runtime
+ARG DOTNET_VERSION
+RUN apt-get install -y aspnetcore-runtime-$DOTNET_VERSION
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~ build stage ~~~~~~~~~~~~~~~~~~~~~~~~#
-FROM base AS build
+FROM runtime AS build
 
 #Install dotnet sdk
 ARG DOTNET_VERSION
@@ -77,11 +85,7 @@ RUN dotnet publish --no-build -c Release -o /app/publish
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ final stage ~~~~~~~~~~~~~~~~~~~~~~~~#
-FROM base AS final
-
-#Install aspnet runtime
-ARG DOTNET_VERSION
-RUN apt-get install -y aspnetcore-runtime-$DOTNET_VERSION
+FROM runtime AS final
 
 #Basic configs
 ENV ASPNETCORE_URLS=http://*:80
