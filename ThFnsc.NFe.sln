@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E46C4D64-C580-49C3-9136-E3CD41A9DFDD}"
@@ -29,17 +30,29 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Infra", "src\ThF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{AEB61D1E-FDBC-413C-A759-7E6B52739AE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThFnsc.NFe.Services.ContaJa", "src\services\ThFnsc.NFe.Services.ContaJa\ThFnsc.NFe.Services.ContaJa.csproj", "{13DCC88F-03FC-45DC-971C-9385BEC4A0A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.ContaJa", "src\services\ThFnsc.NFe.Services.ContaJa\ThFnsc.NFe.Services.ContaJa.csproj", "{13DCC88F-03FC-45DC-971C-9385BEC4A0A4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.IPMNF", "src\services\ThFnsc.NFe.Services.IPMNF\ThFnsc.NFe.Services.IPMNF.csproj", "{606A9B83-DDBE-4A49-88B9-99349E61B9AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThFnsc.NFe.Services.SMTP", "src\services\ThFnsc.NFe.Services.SMTP\ThFnsc.NFe.Services.SMTP.csproj", "{F45AC366-5415-454E-AED2-A01D5FB5C056}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.SMTP", "src\services\ThFnsc.NFe.Services.SMTP\ThFnsc.NFe.Services.SMTP.csproj", "{F45AC366-5415-454E-AED2-A01D5FB5C056}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThFnsc.NFe.Services.PuppeteerHTMLToPDF", "src\services\ThFnsc.NFe.Services.PuppeteerHTMLToPDF\ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj", "{2E432202-CEDD-48FC-87F4-22DD5FB1ABBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.PuppeteerHTMLToPDF", "src\services\ThFnsc.NFe.Services.PuppeteerHTMLToPDF\ThFnsc.NFe.Services.PuppeteerHTMLToPDF.csproj", "{2E432202-CEDD-48FC-87F4-22DD5FB1ABBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThFnsc.NFe.Services.RazorEngineRenderer", "src\services\ThFnsc.NFe.Services.RazorEngineRenderer\ThFnsc.NFe.Services.RazorEngineRenderer.csproj", "{F4584A61-34C0-4D0A-99C8-D16485971239}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.RazorEngineRenderer", "src\services\ThFnsc.NFe.Services.RazorEngineRenderer\ThFnsc.NFe.Services.RazorEngineRenderer.csproj", "{F4584A61-34C0-4D0A-99C8-D16485971239}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThFnsc.NFe.Services.ChromeUtilities", "src\services\ThFnsc.NFe.Services.ChromeUtilities\ThFnsc.NFe.Services.ChromeUtilities.csproj", "{B3AC7614-1637-43B2-BD40-75049663C308}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThFnsc.NFe.Services.ChromeUtilities", "src\services\ThFnsc.NFe.Services.ChromeUtilities\ThFnsc.NFe.Services.ChromeUtilities.csproj", "{B3AC7614-1637-43B2-BD40-75049663C308}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2745F7B1-48B6-47C3-81A2-A59B740675B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{ACA1AF78-E32E-42E3-A5C7-7AE1B0B87031}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\docker.yml = .github\workflows\docker.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{288F7EAB-151E-4074-BEFE-B92C8C8CD4BB}"
+	ProjectSection(SolutionItems) = preProject
+		assets\docker-compose.yml = assets\docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +121,9 @@ Global
 		{2E432202-CEDD-48FC-87F4-22DD5FB1ABBB} = {AEB61D1E-FDBC-413C-A759-7E6B52739AE6}
 		{F4584A61-34C0-4D0A-99C8-D16485971239} = {AEB61D1E-FDBC-413C-A759-7E6B52739AE6}
 		{B3AC7614-1637-43B2-BD40-75049663C308} = {AEB61D1E-FDBC-413C-A759-7E6B52739AE6}
+		{2745F7B1-48B6-47C3-81A2-A59B740675B9} = {168D4613-24CB-4F51-9F82-9F4DBAA69C4A}
+		{ACA1AF78-E32E-42E3-A5C7-7AE1B0B87031} = {2745F7B1-48B6-47C3-81A2-A59B740675B9}
+		{288F7EAB-151E-4074-BEFE-B92C8C8CD4BB} = {168D4613-24CB-4F51-9F82-9F4DBAA69C4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {26EB475C-7DDC-4547-8F03-515E507EC5F5}
