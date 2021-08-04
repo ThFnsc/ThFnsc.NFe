@@ -10,17 +10,7 @@
 @inject NotificationAppService _notification
 
 <Alert @ref="_alert"/>
-
-@if (_nfes == null)
-{
-    <Loader />
-}
-else if (!_nfes.Any())
-{
-    <div class="alert alert-info">Nada encontrado.</div>
-}
-else
-{
+<LoadableList Items="_nfes">
     <TList Items="_nfes">
         <TableHeader>
             <td>Data</td>
@@ -33,10 +23,10 @@ else
         </TableHeader>
         <Each Context="nf">
             @{var statusColor = nf.Success.HasValue
-                ? nf.Success.Value
-                    ? "success"
-                    : "danger"
-                : "warning";
+                  ? nf.Success.Value
+                      ? "success"
+                      : "danger"
+                  : "warning";
             }
             <tr class="text-@statusColor">
                 <td>@nf.IssuedAt</td>
@@ -57,17 +47,17 @@ else
                             <span class="oi oi-bell"></span>
                         </button>
                         @if (nf.Success is null || !nf.Success.Value)
-                            {
+                        {
                             <button class="btn btn-danger btn-sm" @onclick='() => DeleteAsync(nf)'>
                                 <span class="oi oi-trash"></span>
                             </button>
-                            }
+                        }
                     </div>
                 </td>
             </tr>
         </Each>
     </TList>
-}
+</LoadableList>
 
 @code {
     private List<NFModel> _nfes;
