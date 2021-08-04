@@ -37,12 +37,8 @@ namespace ThFnsc.NFe
         public void Configure(
             IApplicationBuilder app,
             IWebHostEnvironment env,
-            NFContext context,
             ILogger<Startup> logger)
         {
-            logger.LogInformation("Migrating database...");
-            context.Database.Migrate();
-
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 

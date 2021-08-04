@@ -14,8 +14,9 @@ namespace ThFnsc.NFe.Configuration
                 opt.UseMySQL(configuration.GetConnectionString("Default")));
 
             using var sp = services.BuildServiceProvider();
-            sp.GetRequiredService<ILogger<NFContext>>().LogInformation("Ensuring schema is created...");
-            sp.GetRequiredService<NFContext>().Database.EnsureCreated();
+
+            sp.GetRequiredService<ILogger<NFContext>>().LogInformation("Migrating database...");
+            sp.GetRequiredService<NFContext>().Database.Migrate();
 
             return services;
         }
