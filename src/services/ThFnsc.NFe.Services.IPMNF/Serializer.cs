@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml.Serialization;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Services.IPMNF.Models;

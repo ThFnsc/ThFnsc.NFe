@@ -1,5 +1,4 @@
-﻿using System;
-using ThFnsc.NFe.Models.Document;
+﻿using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.Provider;
 
 namespace ThFnsc.NFe.Models.NFe

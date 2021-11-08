@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Repositories;
 

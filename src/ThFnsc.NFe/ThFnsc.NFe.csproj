@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	<ImplicitUsings>true</ImplicitUsings>
     <UserSecretsId>0e262419-5aaa-4ac2-9be8-193bab2c29d4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>

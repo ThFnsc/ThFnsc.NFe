@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using ThFnsc.NFe.Core.Entities.Shared;
+﻿using ThFnsc.NFe.Core.Entities.Shared;
 
 namespace ThFnsc.NFe.Data.Repositories
 {

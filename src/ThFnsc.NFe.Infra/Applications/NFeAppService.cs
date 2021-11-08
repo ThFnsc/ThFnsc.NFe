@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;

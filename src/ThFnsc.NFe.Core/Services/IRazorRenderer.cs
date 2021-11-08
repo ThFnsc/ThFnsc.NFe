@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace ThFnsc.NFe.Core.Services
+﻿namespace ThFnsc.NFe.Core.Services
 {
     public interface IRazorRenderer
     {

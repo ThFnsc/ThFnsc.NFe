@@ -1,6 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Services.RazorEngineRenderer;
 
 namespace ThFnsc.NFe.Tests

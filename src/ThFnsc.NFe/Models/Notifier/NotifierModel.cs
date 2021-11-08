@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ThFnsc.NFe.Models.Notifier
+﻿namespace ThFnsc.NFe.Models.Notifier
 {
     public class NotifierModel
     {

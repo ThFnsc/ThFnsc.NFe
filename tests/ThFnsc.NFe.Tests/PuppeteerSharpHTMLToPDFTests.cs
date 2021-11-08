@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Services.PuppeteerHTMLToPDF;
 
 namespace ThFnsc.NFe.Tests

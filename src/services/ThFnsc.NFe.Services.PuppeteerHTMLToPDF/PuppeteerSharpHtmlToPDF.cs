@@ -1,8 +1,6 @@
 ﻿using PuppeteerSharp;
-using System.Linq;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
-using ThFnsc.NFe.Infra.Services.Chrome;
+using ThFnsc.NFe.Services.ChromeUtilities;
 
 namespace ThFnsc.NFe.Services.PuppeteerHTMLToPDF
 {

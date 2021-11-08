@@ -1,7 +1,5 @@
 ﻿using Hangfire;
 using Hangfire.MySql;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ThFnsc.NFe.Configuration
 {

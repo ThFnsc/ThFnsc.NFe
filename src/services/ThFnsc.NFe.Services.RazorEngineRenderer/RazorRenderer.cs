@@ -1,8 +1,6 @@
 ﻿using RazorEngine;
 using RazorEngine.Templating;
-using System;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 
 namespace ThFnsc.NFe.Services.RazorEngineRenderer

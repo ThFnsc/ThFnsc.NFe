@@ -1,9 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Repositories;

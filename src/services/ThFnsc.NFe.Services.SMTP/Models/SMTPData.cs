@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ThFnsc.NFe.Services.SMTP.Models
+﻿namespace ThFnsc.NFe.Services.SMTP.Models
 {
     public class SMTPData
     {

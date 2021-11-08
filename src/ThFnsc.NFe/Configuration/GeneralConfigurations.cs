@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-namespace ThFnsc.NFe.Configuration
+﻿namespace ThFnsc.NFe.Configuration
 {
     public static class GeneralConfigurations
     {

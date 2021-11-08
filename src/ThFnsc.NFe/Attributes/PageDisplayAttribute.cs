@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ThFnsc.NFe.Attributes
+﻿namespace ThFnsc.NFe.Attributes
 {
     public class PageDisplayAttribute : Attribute
     {

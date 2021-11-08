@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ThFnsc.NFe.Models.Document;
+﻿using ThFnsc.NFe.Models.Document;
 using ThFnsc.NFe.Models.Notifier;
 using ThFnsc.NFe.Models.Provider;
 

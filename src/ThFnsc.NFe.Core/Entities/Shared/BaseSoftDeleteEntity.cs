@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace ThFnsc.NFe.Core.Entities.Shared
 {

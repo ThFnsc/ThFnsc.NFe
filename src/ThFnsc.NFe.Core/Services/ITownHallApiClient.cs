@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using ThFnsc.NFe.Core.Entities;
+﻿using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Models;
 
 namespace ThFnsc.NFe.Core.Services
