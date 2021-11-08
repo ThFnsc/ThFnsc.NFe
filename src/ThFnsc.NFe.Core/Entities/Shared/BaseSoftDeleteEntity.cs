@@ -1,18 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace ThFnsc.NFe.Core.Entities.Shared
-{
-    [Index(nameof(DeletedAt))]
-    public abstract class BaseSoftDeleteEntity : BaseEntity
-    {
-        public DateTimeOffset? DeletedAt { get; private set; }
+namespace ThFnsc.NFe.Core.Entities.Shared;
 
-        public BaseSoftDeleteEntity Delete()
-        {
-            if (DeletedAt.HasValue)
-                throw new InvalidOperationException("Entity cannot be deleted twice");
-            DeletedAt = DateTimeOffset.UtcNow;
-            return this;
-        }
+[Index(nameof(DeletedAt))]
+public abstract class BaseSoftDeleteEntity : BaseEntity
+{
+    public DateTimeOffset? DeletedAt { get; private set; }
+
+    public BaseSoftDeleteEntity Delete()
+    {
+        if (DeletedAt.HasValue)
+            throw new InvalidOperationException("Entity cannot be deleted twice");
+        DeletedAt = DateTimeOffset.UtcNow;
+        return this;
     }
 }

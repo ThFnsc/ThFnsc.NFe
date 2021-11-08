@@ -1,7 +1,6 @@
-﻿namespace ThFnsc.NFe.Core.Services
+﻿namespace ThFnsc.NFe.Core.Services;
+
+public interface IRazorRenderer
 {
-    public interface IRazorRenderer
-    {
-        Task<string> RenderAsync(string templateKey, string template, object model);
-    }
+    Task<string> RenderAsync(string templateKey, string template, object model);
 }

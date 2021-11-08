@@ -5,23 +5,22 @@ using ThFnsc.NFe.Services.PuppeteerHTMLToPDF;
 using ThFnsc.NFe.Services.RazorEngineRenderer;
 using ThFnsc.NFe.Services.SMTP;
 
-namespace ThFnsc.NFe.Configuration
+namespace ThFnsc.NFe.Configuration;
+
+public static class DependencyInjectionConfigurations
 {
-    public static class DependencyInjectionConfigurations
+    public static IServiceCollection AddDependencyInjectionConfigs(this IServiceCollection services)
     {
-        public static IServiceCollection AddDependencyInjectionConfigs(this IServiceCollection services)
-        {
-            services.AddScoped<NFeAppService>();
-            services.AddScoped<ScheduledGenerationAppService>();
-            services.AddScoped<NotificationAppService>();
+        services.AddScoped<NFeAppService>();
+        services.AddScoped<ScheduledGenerationAppService>();
+        services.AddScoped<NotificationAppService>();
 
-            services.AddSingleton<IHtmlToPDF, PuppeteerSharpHtmlToPDF>();
-            services.AddSingleton<IRazorRenderer, RazorRenderer>();
+        services.AddSingleton<IHtmlToPDF, PuppeteerSharpHtmlToPDF>();
+        services.AddSingleton<IRazorRenderer, RazorRenderer>();
 
-            services.AddScoped<INFNotifier, ContaJaNFeNotifier>();
-            services.AddScoped<INFNotifier, SMTPNotifier>();
+        services.AddScoped<INFNotifier, ContaJaNFeNotifier>();
+        services.AddScoped<INFNotifier, SMTPNotifier>();
 
-            return services;
-        }
+        return services;
     }
 }
