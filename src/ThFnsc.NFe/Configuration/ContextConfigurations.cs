@@ -8,10 +8,13 @@ namespace ThFnsc.NFe.Configuration
 {
     public static class ContextConfigurations
     {
-        public static IServiceCollection AddContextConfigs(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public static IServiceCollection AddContextConfigs(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<NFContext>(opt =>
-                opt.UseMySQL(configuration.GetConnectionString("Default")));
+            {
+                var cs = configuration.GetConnectionString("Default");
+                opt.UseMySQL(cs);
+            });
 
             using var sp = services.BuildServiceProvider();
 
