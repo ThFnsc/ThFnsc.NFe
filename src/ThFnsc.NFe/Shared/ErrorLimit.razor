@@ -1,0 +1,35 @@
+﻿@inherits ErrorBoundaryBase
+@inject ILogger<ErrorLimit> _logger
+
+@if(CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="error-bg">
+        <div class="alert alert-danger pt-1 pb-2 m-3 d-flex flex-column align-items-center" role="alert">
+            <strong>Ocorreu um erro inesperado</strong>
+        
+            <span class="text-muted" style="font-size:smaller;">
+                <span><i>@CurrentException.GetType().Name: @CurrentException.Message</i></span>
+            </span>
+
+            <div class="btn-group btn-group-xs mt-2">
+                <button class="btn btn-warning" @onclick=Recover>Tentar novamente</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        _logger.LogError(exception, $"{{ErrorLimitType}}: {exception.Message}", exception.GetType().Name);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public void Retry() =>
+        Recover();
+}

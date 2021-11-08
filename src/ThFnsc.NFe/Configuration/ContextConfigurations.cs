@@ -1,24 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ThFnsc.NFe.Data.Context;
 
-namespace ThFnsc.NFe.Configuration
+namespace ThFnsc.NFe.Configuration;
+
+public static class ContextConfigurations
 {
-    public static class ContextConfigurations
+    public static IServiceCollection AddContextConfigs(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddContextConfigs(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        services.AddDbContext<NFContext>(opt =>
         {
-            services.AddDbContext<NFContext>(opt =>
-                opt.UseMySQL(configuration.GetConnectionString("Default")));
+            var cs = configuration.GetConnectionString("Default");
+            opt.UseMySQL(cs);
+        });
 
-            using var sp = services.BuildServiceProvider();
+        using var sp = services.BuildServiceProvider();
 
-            sp.GetRequiredService<ILogger<NFContext>>().LogInformation("Migrating database...");
-            sp.GetRequiredService<NFContext>().Database.Migrate();
+        sp.GetRequiredService<ILogger<NFContext>>().LogInformation("Migrating database...");
+        sp.GetRequiredService<NFContext>().Database.Migrate();
 
-            return services;
-        }
+        return services;
     }
 }
