@@ -1,6 +1,9 @@
-﻿namespace ThFnsc.NFe.Core.Services;
+﻿using System.Threading.Tasks;
 
-public interface IHtmlToPDF
+namespace ThFnsc.NFe.Core.Services
 {
-    Task<byte[]> ConvertHTMLToPDF(string html);
+    public interface IHtmlToPDF
+    {
+        Task<byte[]> ConvertHTMLToPDF(string html);
+    }
 }

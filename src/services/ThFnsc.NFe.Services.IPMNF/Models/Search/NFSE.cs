@@ -1,10 +1,11 @@
 ﻿using System.Xml.Serialization;
 
-namespace ThFnsc.NFe.Services.IPMNF.Models.Search;
-
-[XmlRoot("nfse")]
-public class NFSE
+namespace ThFnsc.NFe.Services.IPMNF.Models.Search
 {
-    [XmlElement(ElementName = "pesquisa")]
-    public Pesquisa Pesquisa { get; set; }
+    [XmlRoot("nfse")]
+    public class NFSE
+    {
+        [XmlElement(ElementName = "pesquisa")]
+        public Pesquisa Pesquisa { get; set; }
+    }
 }

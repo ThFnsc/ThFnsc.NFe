@@ -1,20 +1,23 @@
-﻿namespace ThFnsc.NFe.Core.Models;
+﻿using System;
 
-public class TownHallResponse
+namespace ThFnsc.NFe.Core.Models
 {
-    public bool Success { get; set; }
+    public class TownHallResponse
+    {
+        public bool Success { get; set; }
 
-    public string RawResponse { get; set; }
+        public string RawResponse { get; set; }
 
-    public string ReturnedXML { get; set; }
+        public string ReturnedXML { get; set; }
 
-    public byte[] ReturnedPDF { get; set; }
+        public byte[] ReturnedPDF { get; set; }
 
-    public int Series { get; set; }
+        public int Series { get; set; }
 
-    public string VerificationCode { get; set; }
+        public string VerificationCode { get; set; }
 
-    public string SentXML { get; set; }
+        public string SentXML { get; set; }
 
-    public Exception Error { get; set; }
+        public Exception Error { get; set; }
+    }
 }

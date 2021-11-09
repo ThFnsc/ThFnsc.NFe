@@ -1,18 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ThFnsc.NFe.Core.Entities.Shared;
-
-[Index(nameof(CreatedAt))]
-public abstract class BaseEntity
+namespace ThFnsc.NFe.Core.Entities.Shared
 {
-    [Key]
-    public int Id { get; private set; }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public BaseEntity()
+    [Index(nameof(CreatedAt))]
+    public abstract class BaseEntity
     {
-        CreatedAt = DateTimeOffset.UtcNow;
+        [Key]
+        public int Id { get; private set; }
+
+        public DateTimeOffset CreatedAt { get; private set; }
+
+        public BaseEntity()
+        {
+            CreatedAt = DateTimeOffset.UtcNow;
+        }
     }
 }

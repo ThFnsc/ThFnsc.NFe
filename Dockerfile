@@ -1,6 +1,6 @@
 ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=21.04
-ARG DOTNET_VERSION=6.0
+ARG DOTNET_VERSION=5.0
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~ base stage ~~~~~~~~~~~~~~~~~~~~~~~~#

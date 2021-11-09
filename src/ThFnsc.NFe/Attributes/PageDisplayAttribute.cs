@@ -1,10 +1,13 @@
-﻿namespace ThFnsc.NFe.Attributes;
+﻿using System;
 
-public class PageDisplayAttribute : Attribute
+namespace ThFnsc.NFe.Attributes
 {
-    public string OpenIcon { get; set; }
+    public class PageDisplayAttribute : Attribute
+    {
+        public string OpenIcon { get; set; }
 
-    public string Name { get; set; }
+        public string Name { get; set; }
 
-    public float Order { get; set; }
+        public float Order { get; set; }
+    }
 }

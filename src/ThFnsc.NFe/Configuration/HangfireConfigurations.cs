@@ -1,24 +1,27 @@
 ﻿using Hangfire;
 using Hangfire.MySql;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ThFnsc.NFe.Configuration;
-
-public static class HangfireConfigurations
+namespace ThFnsc.NFe.Configuration
 {
-    public static IServiceCollection AddHangfireConfigs(this IServiceCollection services, IConfiguration conf)
+    public static class HangfireConfigurations
     {
-        services.AddHangfire(configuration => configuration
-            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UseStorage(new MySqlStorage(conf.GetConnectionString("Default") + ";Allow User Variables=true", new MySqlStorageOptions
-            {
-                TablesPrefix = "HF_",
-                PrepareSchemaIfNecessary = true
-            })));
+        public static IServiceCollection AddHangfireConfigs(this IServiceCollection services, IConfiguration conf)
+        {
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseStorage(new MySqlStorage(conf.GetConnectionString("Default") + ";Allow User Variables=true", new MySqlStorageOptions
+                {
+                    TablesPrefix = "HF_",
+                    PrepareSchemaIfNecessary = true
+                })));
 
-        services.AddHangfireServer();
+            services.AddHangfireServer();
 
-        return services;
+            return services;
+        }
     }
 }

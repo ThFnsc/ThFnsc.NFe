@@ -1,25 +1,28 @@
 ﻿using RazorEngine;
 using RazorEngine.Templating;
+using System;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 
-namespace ThFnsc.NFe.Services.RazorEngineRenderer;
-
-public class RazorRenderer : IRazorRenderer
+namespace ThFnsc.NFe.Services.RazorEngineRenderer
 {
-    public Task<string> RenderAsync(string templateKey, string template, object model)
+    public class RazorRenderer : IRazorRenderer
     {
-        if (string.IsNullOrWhiteSpace(templateKey))
+        public Task<string> RenderAsync(string templateKey, string template, object model)
         {
-            using var sha = SHA512.Create();
-            var hash = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(template));
-            templateKey = Convert.ToBase64String(hash);
+            if (string.IsNullOrWhiteSpace(templateKey))
+            {
+                using var sha = SHA512.Create();
+                var hash = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(template));
+                templateKey = Convert.ToBase64String(hash);
+            }
+            var result = Engine.Razor.RunCompile(
+                templateSource: template,
+                name: templateKey,
+                modelType: null,
+                model: model);
+            return Task.FromResult(result);
         }
-        var result = Engine.Razor.RunCompile(
-            templateSource: template,
-            name: templateKey,
-            modelType: null,
-            model: model);
-        return Task.FromResult(result);
     }
 }

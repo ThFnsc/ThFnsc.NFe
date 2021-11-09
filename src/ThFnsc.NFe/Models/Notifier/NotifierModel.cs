@@ -1,14 +1,17 @@
-﻿namespace ThFnsc.NFe.Models.Notifier;
+﻿using System;
 
-public class NotifierModel
+namespace ThFnsc.NFe.Models.Notifier
 {
-    public int Id { get; set; }
+    public class NotifierModel
+    {
+        public int Id { get; set; }
 
-    public string Title { get; set; }
+        public string Title { get; set; }
 
-    public string NotifierType { get; set; }
+        public string NotifierType { get; set; }
 
-    public string JsonData { get; set; }
+        public string JsonData { get; set; }
 
-    public TimeSpan Delay { get; set; }
+        public TimeSpan Delay { get; set; }
+    }
 }

@@ -1,11 +1,14 @@
-﻿using ThFnsc.NFe.Core.Entities;
+﻿using System;
+using System.Threading.Tasks;
+using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Models;
 
-namespace ThFnsc.NFe.Core.Services;
-
-public interface ITownHallApiClient
+namespace ThFnsc.NFe.Core.Services
 {
-    Task<TownHallResponse> GenerateAsync(IssuedNFe nfe);
+    public interface ITownHallApiClient
+    {
+        Task<TownHallResponse> GenerateAsync(IssuedNFe nfe);
 
-    public Type DataType { get; }
+        public Type DataType { get; }
+    }
 }

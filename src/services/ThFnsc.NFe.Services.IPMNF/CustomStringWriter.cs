@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
-namespace ThFnsc.NFe.Services.IPMNF;
-
-internal class CustomStringWriter : StringWriter
+namespace ThFnsc.NFe.Services.IPMNF
 {
-    public override Encoding Encoding => Encoding.GetEncoding("ISO-8859-1");
+    internal class CustomStringWriter : StringWriter
+    {
+        public override Encoding Encoding => Encoding.GetEncoding("ISO-8859-1");
+    }
 }

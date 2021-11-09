@@ -1,9 +1,10 @@
 ﻿using System.Xml.Serialization;
 
-namespace ThFnsc.NFe.Services.IPMNF.Models.Search;
-
-public class Pesquisa
+namespace ThFnsc.NFe.Services.IPMNF.Models.Search
 {
-    [XmlElement(ElementName = "codigo_autenticidade")]
-    public string CodAutent { get; set; }
+    public class Pesquisa
+    {
+        [XmlElement(ElementName = "codigo_autenticidade")]
+        public string CodAutent { get; set; }
+    }
 }

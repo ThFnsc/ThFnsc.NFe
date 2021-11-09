@@ -1,9 +1,10 @@
 ﻿using System.Xml.Serialization;
 
-namespace ThFnsc.NFe.Services.IPMNF.Models;
-
-public class Items
+namespace ThFnsc.NFe.Services.IPMNF.Models
 {
-    [XmlElement(ElementName = "lista")]
-    public Item[] Itens { get; set; }
+    public class Items
+    {
+        [XmlElement(ElementName = "lista")]
+        public Item[] Itens { get; set; }
+    }
 }

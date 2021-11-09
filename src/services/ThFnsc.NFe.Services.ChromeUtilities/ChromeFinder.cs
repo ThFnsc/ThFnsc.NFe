@@ -1,22 +1,27 @@
-﻿namespace ThFnsc.NFe.Services.ChromeUtilities;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
-public static class ChromeFinder
+namespace ThFnsc.NFe.Infra.Services.Chrome
 {
-    private static readonly string[] _possiblePaths = new string[]
+    public static class ChromeFinder
     {
+        private static string[] _possiblePaths = new string[]
+        {
             "/usr/bin/google-chrome",
             @"C:\Program Files\Google\Chrome\Application\chrome.exe",
             @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-    };
+        };
 
-    private static readonly Lazy<string> _finder = new(() =>
-    {
-        foreach (var possiblePath in _possiblePaths)
-            if (File.Exists(possiblePath))
-                return possiblePath;
-        throw new FileNotFoundException("No chrome executable found in predefined paths");
-    });
+        private static readonly Lazy<string> _finder = new(() =>
+        {
+            foreach (var possiblePath in _possiblePaths)
+                if (File.Exists(possiblePath))
+                    return possiblePath;
+            throw new FileNotFoundException("No chrome executable found in predefined paths");
+        });
 
-    public static Task<string> FindChromeAsync() =>
-        Task.FromResult(_finder.Value);
+        public static Task<string> FindChromeAsync() =>
+            Task.FromResult(_finder.Value);
+    }
 }

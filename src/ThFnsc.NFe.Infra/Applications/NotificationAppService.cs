@@ -1,51 +1,55 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Services;
 using ThFnsc.NFe.Data.Context;
 using ThFnsc.NFe.Data.Repositories;
 
-namespace ThFnsc.NFe.Infra.Applications;
-
-[AutomaticRetry(Attempts = 0)]
-public class NotificationAppService
+namespace ThFnsc.NFe.Infra.Applications
 {
-    private readonly NFContext _context;
-    private readonly IEnumerable<INFNotifier> _nfNotifiers;
-
-    public NotificationAppService(
-        NFContext context,
-        IEnumerable<INFNotifier> nfNotifiers)
+    [AutomaticRetry(Attempts = 0)]
+    public class NotificationAppService
     {
-        _context = context;
-        _nfNotifiers = nfNotifiers;
-    }
+        private readonly NFContext _context;
+        private readonly IEnumerable<INFNotifier> _nfNotifiers;
 
-    public async Task NotifyAsync(int nfId, int notifierId)
-    {
-        var nf = await _context.NFes
-            .Active()
-            .OfId(nfId)
-            .Include(n => n.DocumentTo.Address)
-            .Include(n => n.Provider.Issuer.Address)
-            .SingleAsync();
+        public NotificationAppService(
+            NFContext context,
+            IEnumerable<INFNotifier> nfNotifiers)
+        {
+            _context = context;
+            _nfNotifiers = nfNotifiers;
+        }
 
-        var notifier = await _context.NFNotifiers
-            .Active()
-            .OfId(notifierId)
-            .SingleAsync();
+        public async Task NotifyAsync(int nfId, int notifierId)
+        {
+            var nf = await _context.NFes
+                .Active()
+                .OfId(nfId)
+                .Include(n => n.DocumentTo.Address)
+                .Include(n => n.Provider.Issuer.Address)
+                .SingleAsync();
 
-        var notifierService = _nfNotifiers
-            .Single(n => n.GetType().FullName == notifier.NotifierType);
+            var notifier = await _context.NFNotifiers
+                .Active()
+                .OfId(notifierId)
+                .SingleAsync();
 
-        await notifierService.NotifyAsync(
-            data: JsonSerializer.Deserialize(
-                json: notifier.JsonData,
-                returnType: notifierService.DataType,
-                options: new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                }),
-            nfe: nf);
+            var notifierService = _nfNotifiers
+                .Single(n => n.GetType().FullName == notifier.NotifierType);
+
+            await notifierService.NotifyAsync(
+                data: JsonSerializer.Deserialize(
+                    json: notifier.JsonData,
+                    returnType: notifierService.DataType,
+                    options: new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }),
+                nfe: nf);
+        }
     }
 }

@@ -1,6 +1,7 @@
-﻿namespace ThFnsc.NFe.Services.IPMNF.Models;
-
-public class DataModel
+﻿namespace ThFnsc.NFe.Services.IPMNF.Models
 {
-    public string Password { get; set; } = "12345678";
+    public class DataModel
+    {
+        public string Password { get; set; } = "12345678";
+    }
 }
