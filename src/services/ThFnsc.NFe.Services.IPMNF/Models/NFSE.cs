@@ -5,6 +5,9 @@ namespace ThFnsc.NFe.Services.IPMNF.Models
     [XmlRoot("nfse")]
     public class NFSE
     {
+        [XmlElement(ElementName = "identificador")]
+        public string Identificador { get; set; }
+        
         [XmlElement(ElementName = "nf")]
         public NF NF { get; set; }
 

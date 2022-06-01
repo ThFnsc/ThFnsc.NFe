@@ -6,11 +6,7 @@ namespace ThFnsc.NFe.Core.Models
     {
         public bool Success { get; set; }
 
-        public string RawResponse { get; set; }
-
         public string ReturnedXML { get; set; }
-
-        public byte[] ReturnedPDF { get; set; }
 
         public int Series { get; set; }
 
@@ -19,5 +15,9 @@ namespace ThFnsc.NFe.Core.Models
         public string SentXML { get; set; }
 
         public Exception Error { get; set; }
+
+        public string LinkNFSE { get; set; }
+
+        public string RawResponse { get; set; }
     }
 }

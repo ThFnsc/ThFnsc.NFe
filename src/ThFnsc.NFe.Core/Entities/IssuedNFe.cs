@@ -19,12 +19,14 @@ namespace ThFnsc.NFe.Core.Entities
 
         public DateTimeOffset IssuedAt { get; private set; }
 
+        public string LinkToNF { get; private set; }
+        
         public string ReturnedContent { get; private set; }
 
         public string ReturnedXMLContent { get; private set; }
 
         [Column(TypeName = "MEDIUMBLOB")]
-        public byte[] ReturnedPDF { get; private set; }
+        public byte[] ReturnedPDF { get; private set; } = Array.Empty<byte>();
 
         public string SentContent { get; private set; }
 
@@ -62,6 +64,7 @@ namespace ThFnsc.NFe.Core.Entities
             string contentReceivedRaw,
             string returnedXMLContent,
             byte[] returnedPDF,
+            string linkToNF,
             int series,
             string verificationCode,
             DateTimeOffset issuedAt)
@@ -77,6 +80,7 @@ namespace ThFnsc.NFe.Core.Entities
             Series = series;
             VerificationCode = verificationCode;
             IssuedAt = issuedAt;
+            LinkToNF = linkToNF;
         }
 
         protected IssuedNFe() { }

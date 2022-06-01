@@ -16,6 +16,8 @@ namespace ThFnsc.NFe.Models.NFe
 
         public DateTimeOffset IssuedAt { get; set; }
 
+        public string LinkToNF { get; set; }
+
         public DocumentModel DocumentTo { get; set; }
 
         public bool? Success { get; set; }

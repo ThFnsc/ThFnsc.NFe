@@ -1,10 +1,11 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using ThFnsc.NFe.Core.Entities;
 using ThFnsc.NFe.Core.Models;
 using ThFnsc.NFe.Core.Services;
@@ -28,13 +29,12 @@ namespace ThFnsc.NFe.Services.IPMNF
             _htmlToPDF = htmlToPDF;
         }
 
-        private (int series, string verifCode) ParseReturnedHTML(string html)
+        private static Retorno ParseReturnedXML(string xml)
         {
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            var series = doc.DocumentNode.SelectSingleNode("//*[contains(text(),'Número da NFS-e')]/parent::*/*[last()]");
-            var verifCode = doc.DocumentNode.SelectSingleNode("//*[contains(text(),'Autenticidade')]/parent::*/*[last()]");
-            return (int.Parse(series.InnerText.Trim()), verifCode.InnerText.Trim());
+            var serializer = new XmlSerializer(typeof(Retorno));
+            var obj = (Retorno) serializer.Deserialize(new StringReader(xml));
+            obj.Validate();
+            return obj;
         }
 
         private static string GenerateRequestXML(IssuedNFe nfe) =>
@@ -44,7 +44,8 @@ namespace ThFnsc.NFe.Services.IPMNF
                 value: nfe.Value,
                 serviceId: nfe.ServiceId,
                 serviceDescription: nfe.ServiceDescription,
-                aliquotPercentage: nfe.AliquotPercentage);
+                aliquotPercentage: nfe.AliquotPercentage,
+                identifier: nfe.CreatedAt.ToString("MM_yyyy"));
 
         private async Task<string> PostAsync(string xml, IssuedNFe nfe, string url)
         {
@@ -54,7 +55,6 @@ namespace ThFnsc.NFe.Services.IPMNF
             
             request.Headers.Authorization = new BasicAuthenticationHeaderValue(nfe.Provider.Issuer.DocIdentifier, data.Password);
 
-            //formData.Add(new StringContent(nfe.Provider.Issuer.Address.CityId.ToString()), "cidade");
             formData.Add(new StringContent(xml, Encoding.UTF8, "text/xml"), "xml", "arquivo");
             request.Content = formData;
 
@@ -87,40 +87,23 @@ namespace ThFnsc.NFe.Services.IPMNF
                 return new TownHallResponse { Error = e, SentXML = requestXML, RawResponse = response };
             }
 
-            return await ProcessResponseAsync(requestXML, response, nfe);
+            return ProcessResponseAsync(requestXML, response);
         }
 
-        public async Task<TownHallResponse> ProcessResponseAsync(string sent, string received, IssuedNFe nfe)
+        private static TownHallResponse ProcessResponseAsync(string sent, string received)
         {
             var response = new TownHallResponse
             {
                 SentXML = sent,
-                RawResponse = received
+                ReturnedXML = received
             };
 
             try
             {
-                response.ReturnedPDF = await _htmlToPDF.ConvertHTMLToPDF(response.RawResponse);
-            }
-            catch (Exception e)
-            {
-                response.Error = e;
-                return response;
-            }
-
-            try
-            {
-                (response.Series, response.VerificationCode) = ParseReturnedHTML(response.RawResponse);
-            }
-            catch (Exception e)
-            {
-                response.Error = e;
-                return response;
-            }
-
-            try
-            {
-                response.ReturnedXML = await PostAsync(GetXMLXML(response.VerificationCode), nfe, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php?formato_saida=2&eletron=1");
+                var resObj = ParseReturnedXML(received);
+                response.Series = resObj.NumeroNFSE;
+                response.VerificationCode = resObj.CodVerif;
+                response.LinkNFSE = resObj.LinkNFSE;
             }
             catch (Exception e)
             {
@@ -131,14 +114,5 @@ namespace ThFnsc.NFe.Services.IPMNF
             response.Success = true;
             return response;
         }
-
-        private static string GetXMLXML(string verificationCode) =>
-            Serializer.SerializeXML(new Models.Search.NFSE
-            {
-                Pesquisa = new Models.Search.Pesquisa
-                {
-                    CodAutent = verificationCode
-                }
-            });
     }
 }

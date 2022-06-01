@@ -37,12 +37,22 @@
                 <td>@nf.DocumentTo.Name</td>
                 <td>
                     <div class="btn-group">
-                        <button class="btn btn-primary btn-sm" title="Baixar PDF" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
-                            <span class="oi oi-document"></span>
-                        </button>
-                        <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
-                            <span class="oi oi-code"></span>
-                        </button>
+                        @if(nf.LinkToNF == null)
+                        {
+                            <button class="btn btn-primary btn-sm" title="Baixar PDF" @onclick='() => _navManager.NavigateTo($"PDF/{nf.Id}", true)'>
+                                <span class="oi oi-document"></span>
+                            </button>
+                            <button class="btn btn-primary btn-sm" title="Baixar XML" @onclick='() => _navManager.NavigateTo($"XML/{nf.Id}", true)'>
+                                <span class="oi oi-code"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <a href=@nf.LinkToNF target="_blank" class="btn btn-primary btn-sm" title="Acessar NF">
+                                <span class="oi oi-external-link"></span>
+                            </a>
+                        }
+                        
                         <button class="btn btn-success btn-sm" title="Notificar" @onclick='() => NotifyAsync(nf)'>
                             <span class="oi oi-bell"></span>
                         </button>

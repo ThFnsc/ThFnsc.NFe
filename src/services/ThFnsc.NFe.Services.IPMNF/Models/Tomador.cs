@@ -35,7 +35,7 @@ namespace ThFnsc.NFe.Services.IPMNF.Models
         public string Bairro { get; set; }
 
         [XmlElement(ElementName = "cidade")]
-        public string Cidade { get; set; }
+        public int Cidade { get; set; }
 
         [XmlElement(ElementName = "cep")]
         public string CEP { get; set; }

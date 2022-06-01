@@ -71,11 +71,31 @@ namespace ThFnsc.NFe.Infra.Applications
             try
             {
                 var res = await client.GenerateAsync(nf);
-                nf.OnReturned(res.Success, res.Error?.Message, res.SentXML, res.RawResponse, res.ReturnedXML, res.ReturnedPDF, res.Series, res.VerificationCode, DateTimeOffset.UtcNow);
+                nf.OnReturned(
+                    success: res.Success,
+                    errorMessage: res.Error?.Message,
+                    sentContent: res.SentXML,
+                    contentReceivedRaw: res.RawResponse,
+                    returnedXMLContent: res.ReturnedXML,
+                    linkToNF: res.LinkNFSE,
+                    returnedPDF: null,
+                    series: res.Series,
+                    verificationCode: res.VerificationCode,
+                    issuedAt: DateTimeOffset.UtcNow);
             }
             catch (Exception e)
             {
-                nf.OnReturned(false, $"{e.Message}\n{e.StackTrace}", null, null, null, null, 0, null, DateTimeOffset.UtcNow);
+                nf.OnReturned(
+                    success: false,
+                    errorMessage: $"{e.Message}\n{e.StackTrace}",
+                    sentContent: null,
+                    contentReceivedRaw: null,
+                    returnedXMLContent: null,
+                    returnedPDF: null,
+                    linkToNF: null,
+                    series: 0,
+                    verificationCode: null,
+                    issuedAt: DateTimeOffset.UtcNow);
             }
             finally
             {

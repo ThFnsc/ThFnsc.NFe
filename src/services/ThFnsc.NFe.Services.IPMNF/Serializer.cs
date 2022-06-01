@@ -14,10 +14,11 @@ namespace ThFnsc.NFe.Services.IPMNF
             value.ToString("0.00", _culture);
 
 
-        public static string GenerateNFe(Document from, Document to, float value, int serviceId, string serviceDescription, float aliquotPercentage)
+        public static string GenerateNFe(Document from, Document to, float value, int serviceId, string serviceDescription, float aliquotPercentage, string identifier)
         {
             var nfse = new NFSE
             {
+                Identificador = identifier,
                 NF = new()
                 {
                     Data = DateTime.Today.ToString("dd/MM/yyyy"),
@@ -53,7 +54,7 @@ namespace ThFnsc.NFe.Services.IPMNF
                     Complemento = to.Address.Complement,
                     PontoReferencia = string.Empty,
                     Bairro = to.Address.Neighborhood,
-                    Cidade = to.Address.City,
+                    Cidade = to.Address.CityId,
                     CEP = to.Address.PostalCode,
                     DDDFoneComercial = string.Empty,
                     DDDFoneResidencial = string.Empty,
