@@ -10,8 +10,9 @@ namespace ThFnsc.NFe.Configuration
     {
         public static IServiceCollection AddContextConfigs(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
+            var dbConnectionString = configuration.GetConnectionString("Default");
             services.AddDbContext<NFContext>(opt =>
-                opt.UseMySQL(configuration.GetConnectionString("Default")), contextLifetime: ServiceLifetime.Transient);
+                opt.UseMySql(dbConnectionString, ServerVersion.AutoDetect(dbConnectionString)), contextLifetime: ServiceLifetime.Transient);
 
             using var sp = services.BuildServiceProvider();
 

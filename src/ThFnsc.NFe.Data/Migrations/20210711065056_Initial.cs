@@ -1,6 +1,6 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
 
 namespace ThFnsc.NFe.Data.Migrations
 {
@@ -13,7 +13,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Street = table.Column<string>(type: "text", nullable: true),
                     StreetNumber = table.Column<string>(type: "text", nullable: true),
                     City = table.Column<string>(type: "text", nullable: true),
@@ -34,7 +34,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Title = table.Column<string>(type: "text", nullable: true),
                     NotifierType = table.Column<string>(type: "text", nullable: true),
                     JsonData = table.Column<string>(type: "text", nullable: true),
@@ -52,7 +52,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     DocType = table.Column<string>(type: "varchar(767)", nullable: true),
                     DocIdentifier = table.Column<string>(type: "varchar(767)", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: true),
@@ -77,7 +77,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IssuerId = table.Column<int>(type: "int", nullable: true),
                     Data = table.Column<string>(type: "text", nullable: true),
                     TownHallType = table.Column<string>(type: "text", nullable: true),
@@ -100,7 +100,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ProviderId = table.Column<int>(type: "int", nullable: true),
                     Series = table.Column<int>(type: "int", nullable: false),
                     VerificationCode = table.Column<string>(type: "varchar(767)", nullable: true),
@@ -141,7 +141,7 @@ namespace ThFnsc.NFe.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     CronPattern = table.Column<string>(type: "text", nullable: true),
                     ProviderId = table.Column<int>(type: "int", nullable: true),
                     ToDocumentId = table.Column<int>(type: "int", nullable: true),

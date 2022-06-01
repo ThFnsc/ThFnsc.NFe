@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ThFnsc.NFe.Data.Context;
 
@@ -10,9 +11,10 @@ using ThFnsc.NFe.Data.Context;
 namespace ThFnsc.NFe.Data.Migrations
 {
     [DbContext(typeof(NFContext))]
-    partial class NFContextModelSnapshot : ModelSnapshot
+    [Migration("20220601234113_AddLinkToNF")]
+    partial class AddLinkToNF
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
