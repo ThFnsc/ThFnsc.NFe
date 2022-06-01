@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
@@ -50,10 +51,11 @@ namespace ThFnsc.NFe.Services.IPMNF
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             var formData = new MultipartFormDataContent();
             var data = JsonSerializer.Deserialize<DataModel>(nfe.Provider.Data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            formData.Add(new StringContent(nfe.Provider.Issuer.DocIdentifier), "login");
-            formData.Add(new StringContent(data.Password), "senha");
-            formData.Add(new StringContent(nfe.Provider.Issuer.Address.CityId.ToString()), "cidade");
-            formData.Add(new StringContent(xml), "f1", "nf.xml");
+            
+            request.Headers.Authorization = new BasicAuthenticationHeaderValue(nfe.Provider.Issuer.DocIdentifier, data.Password);
+
+            //formData.Add(new StringContent(nfe.Provider.Issuer.Address.CityId.ToString()), "cidade");
+            formData.Add(new StringContent(xml, Encoding.UTF8, "text/xml"), "xml", "arquivo");
             request.Content = formData;
 
             var res = await _client.SendAsync(request);
@@ -78,7 +80,7 @@ namespace ThFnsc.NFe.Services.IPMNF
 
             try
             {
-                response = await PostAsync(requestXML, nfe, "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php");
+                response = await PostAsync(requestXML, nfe, "https://ws-gravatai.atende.net:7443/?pg=rest&service=WNERestServiceNFSe&cidade=padrao");
             }
             catch (Exception e)
             {
