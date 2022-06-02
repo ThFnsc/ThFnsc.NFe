@@ -25,6 +25,9 @@ namespace ThFnsc.NFe.Services.ContaJa.Notifier
 
         public async Task NotifyAsync(object data, IssuedNFe nfe)
         {
+            if (string.IsNullOrWhiteSpace(nfe.ReturnedXMLContent))
+                throw new ArgumentNullException(nameof(nfe.ReturnedXMLContent));
+            
             var confs = data as ContaJaNotifierModel;
             //Open a new instance of Chrome
             using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
