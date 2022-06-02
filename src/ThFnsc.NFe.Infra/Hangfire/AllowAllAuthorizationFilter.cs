@@ -1,10 +1,9 @@
 ﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
 
-namespace ThFnsc.NFe.Infra.Services.Hangfire
+namespace ThFnsc.NFe.Infra.Services.Hangfire;
+
+public class AllowAllAuthorizationFilter : IDashboardAuthorizationFilter
 {
-    public class AllowAllAuthorizationFilter : IDashboardAuthorizationFilter
-    {
-        public bool Authorize([NotNull] DashboardContext context) => true;
-    }
+    public bool Authorize([NotNull] DashboardContext context) => true;
 }
