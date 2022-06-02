@@ -30,25 +30,31 @@ namespace ThFnsc.NFe.Services.SMTP
         {
             var confs = data as SMTPData;
 
-            using var msXml = new MemoryStream(Encoding.UTF8.GetBytes(nfe.ReturnedXMLContent));
-            using var msPdf = new MemoryStream(nfe.ReturnedPDF);
+            var builder = Email
+                .From(confs.Connection.Account, confs.Connection.AccountName)
+                .To(new[] { confs.Connection.Account }
+                    .Concat(confs.ExtraRecipients ?? Array.Empty<string>())
+                    .Distinct()
+                    .Select(m => new FluentEmail.Core.Models.Address(m, null)))
+                .Subject(await _razorRenderer.RenderAsync(null, confs.RazorSubject, nfe))
+                .Body(await _razorRenderer.RenderAsync(null, confs.RazorBody, nfe), true);
+
+            if (string.IsNullOrWhiteSpace(nfe.LinkToNF))
+            {
+                using var msXml = new MemoryStream(Encoding.UTF8.GetBytes(nfe.ReturnedXMLContent));
+                using var msPdf = new MemoryStream(nfe.ReturnedPDF);
+
+                builder
+                    .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nfe.Series}.xml", ContentType = "application/xml", Data = msXml })
+                    .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nfe.Series}.pdf", ContentType = "application/pdf", Data = msPdf });
+            }
 
             var res = await new SmtpSender(
                  new SmtpClient(confs.Connection.Host, confs.Connection.Port)
                  {
                      Credentials = new NetworkCredential(confs.Connection.Username, confs.Connection.Password),
                      EnableSsl = confs.Connection.UseEncryption
-                 })
-            .SendAsync(
-                Email.From(confs.Connection.Account, confs.Connection.AccountName)
-                    .To(new[] { confs.Connection.Account }
-                    .Concat(confs.ExtraRecipients ?? Array.Empty<string>())
-                    .Distinct()
-                    .Select(m => new FluentEmail.Core.Models.Address(m, null)))
-                .Subject(await _razorRenderer.RenderAsync(null, confs.RazorSubject, nfe))
-                .Body(await _razorRenderer.RenderAsync(null, confs.RazorBody, nfe), true)
-                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nfe.Series}.xml", ContentType = "application/xml", Data = msXml })
-                .Attach(new FluentEmail.Core.Models.Attachment { Filename = $"NF-{nfe.Series}.pdf", ContentType = "application/pdf", Data = msPdf }));
+                 }).SendAsync(builder);
 
             if (!res.Successful)
                 throw new Exception(string.Join(", ", res.ErrorMessages));
