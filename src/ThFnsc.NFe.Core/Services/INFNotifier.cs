@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using ThFnsc.NFe.Core.Entities;
 
-namespace ThFnsc.NFe.Core.Services
-{
-    public interface INFNotifier
-    {
-        Type DataType { get; }
+namespace ThFnsc.NFe.Core.Services;
 
-        Task NotifyAsync(object data, IssuedNFe nfe);
-    }
+public interface INFNotifier
+{
+    Type DataType { get; }
+
+    Task NotifyAsync(object data, IssuedNFe nfe);
 }
