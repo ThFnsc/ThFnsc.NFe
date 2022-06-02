@@ -83,6 +83,11 @@ namespace ThFnsc.NFe.Services.ContaJa.Notifier
                 await Task.WhenAll(
                     page.ClickAsync("button[type=\"submit\"]"),
                     page.WaitForNavigationAsync(new NavigationOptions { WaitUntil = new[] { WaitUntilNavigation.DOMContentLoaded } }));
+
+                await page.WaitForExpressionAsync("document.body.innerText.includes('Novo Documento cadastrado com sucesso!')", new()
+                {
+                    Timeout = 5000
+                });
             }
             finally
             {
