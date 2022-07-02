@@ -97,9 +97,10 @@ public class IPMNFApiClient : ITownHallApiClient
         try
         {
             var resObj = ParseReturnedXML(received);
-            response.Series = resObj.NumeroNFSE;
-            response.VerificationCode = resObj.CodVerif;
-            response.LinkNFSE = resObj.LinkNFSE;
+            var nf = resObj.NFSE.NF;
+            response.Series = nf.NumeroNFSE;
+            response.VerificationCode = nf.CodVerif;
+            response.LinkNFSE = nf.LinkNFSE;
         }
         catch (Exception e)
         {
